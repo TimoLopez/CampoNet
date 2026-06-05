@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (user && ['/login', '/registro'].includes(request.nextUrl.pathname)) {
+  if (user && ['/login', '/registro', '/recuperar'].includes(request.nextUrl.pathname)) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
@@ -39,5 +39,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/registro'],
+  matcher: ['/dashboard/:path*', '/login', '/registro', '/recuperar'],
 }
