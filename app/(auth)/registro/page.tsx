@@ -35,26 +35,21 @@ export default function RegistroPage() {
     try {
       const supabase = createClient()
 
-      const { error: authError, data: authData } = await supabase.auth.signUp({
+      const { error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            nombre: data.nombre,
+            telefono: data.telefono || null,
+          },
+        },
       })
 
       if (authError) {
         toast.error(authError.message)
         return
-      }
-
-      if (authData.user) {
-        const { error: profileError } = await supabase
-          .from('escritorios')
-          .insert({ id: authData.user.id, nombre: data.nombre, telefono: data.telefono || null })
-
-        if (profileError) {
-          toast.error('Error al crear el perfil. Intentá de nuevo.')
-          return
-        }
       }
 
       toast.success('Cuenta creada. Revisá tu email para confirmar tu dirección.')
