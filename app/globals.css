@@ -49,29 +49,30 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* CampoNet Design System */
+  --background: oklch(0.97 0.007 87);
+  --foreground: oklch(0.14 0.012 95);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.14 0.012 95);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.14 0.012 95);
+  --primary: oklch(0.32 0.09 138);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.93 0.007 87);
+  --secondary-foreground: oklch(0.25 0.01 90);
+  --muted: oklch(0.93 0.007 87);
+  --muted-foreground: oklch(0.44 0.012 90);
+  --accent: oklch(0.68 0.11 76);
+  --accent-foreground: oklch(0.15 0.01 90);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --border: oklch(0.89 0.009 87);
+  --input: oklch(0.89 0.009 87);
+  --ring: oklch(0.32 0.09 138);
+  --chart-1: oklch(0.32 0.09 138);
+  --chart-2: oklch(0.68 0.11 76);
+  --chart-3: oklch(0.50 0.08 138);
+  --chart-4: oklch(0.75 0.09 76);
+  --chart-5: oklch(0.22 0.07 140);
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
