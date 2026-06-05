@@ -50,12 +50,12 @@ export default function PerfilForm({
 
       const { error } = await supabase
         .from('escritorios')
-        .update({
+        .upsert({
+          id: user!.id,
           nombre: data.nombre,
           telefono: data.telefono || null,
           descripcion: data.descripcion || null,
         })
-        .eq('id', user!.id)
 
       if (error) {
         toast.error('Error al guardar los cambios.')
