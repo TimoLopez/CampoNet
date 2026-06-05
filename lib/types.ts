@@ -1,0 +1,60 @@
+// lib/types.ts
+export type Escritorio = {
+  id: string
+  nombre: string
+  telefono: string | null
+  descripcion: string | null
+  logo_url: string | null
+  created_at: string
+}
+
+export type Campo = {
+  id: string
+  escritorio_id: string
+  titulo: string
+  descripcion: string | null
+  departamento: string
+  hectareas: number
+  precio_usd: number | null
+  precio_ha_usd: number | null
+  tipo: 'ganadero' | 'agricola' | 'forestal' | 'mixto' | null
+  agua: boolean
+  acceso_ruta: boolean
+  lat: number | null
+  lng: number | null
+  fotos: string[]
+  video_url: string | null
+  estado: 'publicado' | 'borrador' | 'archivado'
+  created_at: string
+  updated_at: string
+}
+
+export type Lead = {
+  id: string
+  escritorio_id: string
+  campo_id: string | null
+  nombre: string
+  email: string | null
+  telefono: string | null
+  mensaje: string | null
+  estado: 'nuevo' | 'contactado' | 'negociacion' | 'cerrado' | 'descartado'
+  notas: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type Visita = {
+  id: string
+  campo_id: string
+  lead_id: string | null
+  session_id: string
+  ip_hash: string | null
+  user_agent: string | null
+  created_at: string
+}
+
+export type LeadConVisitas = Lead & {
+  total_visitas: number
+  ultima_visita: string | null
+  es_caliente: boolean
+}
