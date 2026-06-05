@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { LayoutDashboard, MapPin, Users, User, LogOut } from 'lucide-react'
+import { LayoutDashboard, MapPin, Users, User, LogOut, Sprout } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -25,31 +25,57 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0">
-      <div className="p-6 border-b border-gray-200">
-        <span className="text-xl font-bold text-gray-900">CampoNet</span>
+    <aside className="w-64 bg-[#1C3311] flex flex-col shrink-0 h-screen">
+      {/* Logo */}
+      <div className="px-5 py-6 border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#C49A3C]/20 flex items-center justify-center shrink-0">
+            <Sprout className="h-4 w-4 text-[#C49A3C]" />
+          </div>
+          <span className="text-[15px] font-semibold text-white tracking-wide">
+            Campo<span className="text-[#C49A3C]">Net</span>
+          </span>
+        </div>
       </div>
-      <nav className="flex-1 p-4 space-y-1">
-        {navItems.map(({ href, label, icon: Icon, exact }) => (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              'flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors',
-              (exact ? pathname === href : pathname.startsWith(href))
-                ? 'bg-green-50 text-green-700'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-            )}
-          >
-            <Icon className="h-4 w-4 shrink-0" />
-            {label}
-          </Link>
-        ))}
+
+      {/* Nav */}
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+        <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest px-3 pb-2">
+          Gestión
+        </p>
+        {navItems.map(({ href, label, icon: Icon, exact }) => {
+          const isActive = exact ? pathname === href : pathname.startsWith(href)
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={cn(
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer group',
+                isActive
+                  ? 'bg-[#C49A3C]/12 text-[#E8C96A] border border-[#C49A3C]/20'
+                  : 'text-white/55 hover:bg-white/6 hover:text-white/90 border border-transparent'
+              )}
+            >
+              <Icon
+                className={cn(
+                  'h-4 w-4 shrink-0 transition-colors duration-150',
+                  isActive ? 'text-[#C49A3C]' : 'group-hover:text-white/80'
+                )}
+              />
+              <span>{label}</span>
+              {isActive && (
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#C49A3C] shrink-0" />
+              )}
+            </Link>
+          )
+        })}
       </nav>
-      <div className="p-4 border-t border-gray-200">
+
+      {/* Footer / Logout */}
+      <div className="px-3 py-4 border-t border-white/10">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2 w-full rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-medium text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-all duration-150 cursor-pointer"
         >
           <LogOut className="h-4 w-4 shrink-0" />
           Cerrar sesión
