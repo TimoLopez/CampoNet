@@ -1,4 +1,3 @@
-// app/(dashboard)/perfil/page.tsx
 import { createClient } from '@/lib/supabase/server'
 import PerfilForm from './PerfilForm'
 
