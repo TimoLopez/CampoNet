@@ -13,6 +13,9 @@ export default function CrmFilters({ campos }: Props) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
+  const estadoFilter = searchParams.get('estado') ?? 'todos'
+  const campoFilter = searchParams.get('campo') ?? 'todos'
+
   function update(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString())
     if (value === 'todos') {
@@ -20,13 +23,13 @@ export default function CrmFilters({ campos }: Props) {
     } else {
       params.set(key, value)
     }
-    router.push(`${pathname}?${params.toString()}`)
+    router.replace(`${pathname}?${params.toString()}`)
   }
 
   return (
     <div className="flex items-center gap-3 flex-wrap">
       <Select
-        value={searchParams.get('estado') ?? 'todos'}
+        value={estadoFilter}
         onValueChange={v => update('estado', v)}
       >
         <SelectTrigger className="w-44 h-8 text-sm">
@@ -43,7 +46,7 @@ export default function CrmFilters({ campos }: Props) {
       </Select>
 
       <Select
-        value={searchParams.get('campo') ?? 'todos'}
+        value={campoFilter}
         onValueChange={v => update('campo', v)}
       >
         <SelectTrigger className="w-52 h-8 text-sm">
