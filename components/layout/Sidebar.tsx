@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { LayoutDashboard, MapPin, Users, User, LogOut, Sprout } from 'lucide-react'
+import { LayoutDashboard, MapPin, Users, User, LogOut, Sprout, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -13,7 +13,12 @@ const navItems = [
   { href: '/dashboard/perfil', label: 'Mi Perfil', icon: User, exact: false },
 ]
 
-export default function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean
+  onClose?: () => void
+}
+
+export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -25,7 +30,21 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-64 bg-[#1C3311] flex flex-col shrink-0 h-screen">
+    <aside className={cn(
+      'w-64 bg-[#1C3311] flex flex-col h-screen shrink-0',
+      'fixed inset-y-0 left-0 z-50 transition-transform duration-300 ease-in-out',
+      'md:static md:translate-x-0',
+      mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
+    )}>
+      {/* Close button — mobile only */}
+      <button
+        onClick={onClose}
+        className="md:hidden absolute top-3 right-3 text-white/50 hover:text-white transition-colors cursor-pointer"
+        aria-label="Cerrar menú"
+      >
+        <X className="h-5 w-5" />
+      </button>
+
       {/* Logo */}
       <div className="px-5 py-6 border-b border-white/10">
         <div className="flex items-center gap-3">
@@ -49,6 +68,7 @@ export default function Sidebar() {
             <Link
               key={href}
               href={href}
+              onClick={onClose}
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer group',
                 isActive
