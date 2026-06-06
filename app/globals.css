@@ -82,6 +82,28 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Shadow scale */
+  --shadow-xs: 0 1px 2px 0 oklch(0.14 0.012 95 / 0.05);
+  --shadow-sm: 0 1px 3px 0 oklch(0.14 0.012 95 / 0.08), 0 1px 2px -1px oklch(0.14 0.012 95 / 0.06);
+  --shadow-md: 0 4px 6px -1px oklch(0.14 0.012 95 / 0.08), 0 2px 4px -2px oklch(0.14 0.012 95 / 0.06);
+  --shadow-lg: 0 10px 15px -3px oklch(0.14 0.012 95 / 0.08), 0 4px 6px -4px oklch(0.14 0.012 95 / 0.06);
+  --shadow-xl: 0 20px 25px -5px oklch(0.14 0.012 95 / 0.08), 0 8px 10px -6px oklch(0.14 0.012 95 / 0.06);
+  --shadow-card: 0 1px 3px 0 oklch(0.14 0.012 95 / 0.06), 0 1px 2px -1px oklch(0.14 0.012 95 / 0.04);
+  --shadow-card-hover: 0 4px 12px -2px oklch(0.14 0.012 95 / 0.1), 0 2px 6px -2px oklch(0.14 0.012 95 / 0.07);
+  --shadow-gold: 0 0 0 3px oklch(0.68 0.11 76 / 0.15);
+
+  /* Brand tokens */
+  --brand-green: #1C3311;
+  --brand-green-light: #2D5018;
+  --brand-gold: #C49A3C;
+  --brand-gold-light: #E8C96A;
+  --brand-bg: #F2EFE8;
+  --brand-bg-card: #F7F5F0;
+  --brand-text: #1A1A12;
+  --brand-text-muted: #5C5B4F;
+  --brand-border: #E2DFD6;
+  --brand-border-light: #F2EFE8;
 }
 
 .dark {
@@ -127,5 +149,44 @@
   }
   html {
     @apply font-sans;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Prevent layout shift on scrollbar */
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  /* Better focus states */
+  :focus-visible {
+    outline: 2px solid oklch(0.68 0.11 76 / 0.5);
+    outline-offset: 2px;
+  }
+
+  /* Input and button base improvements */
+  input, textarea, select, button {
+    font-family: inherit;
+  }
+
+  /* Better selection color */
+  ::selection {
+    background: oklch(0.68 0.11 76 / 0.2);
+    color: oklch(0.14 0.012 95);
+  }
+}
+
+@layer utilities {
+  .card-base {
+    @apply bg-white rounded-xl border border-[#E2DFD6] shadow-[var(--shadow-card)];
+  }
+  .card-hover {
+    @apply hover:border-[#C49A3C]/30 hover:shadow-[var(--shadow-card-hover)] transition-all duration-200;
+  }
+  .focus-ring-gold {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A3C]/40 focus-visible:ring-offset-1;
   }
 }
