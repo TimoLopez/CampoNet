@@ -22,11 +22,22 @@ export async function POST(request: Request) {
     const ipHash = ip ? createHash('sha256').update(ip).digest('hex') : null
     const userAgent = request.headers.get('user-agent') ?? null
 
+    // If this session already has a known lead for this campo, carry it forward
+    const { data: prevVisita } = await supabaseAdmin
+      .from('visitas')
+      .select('lead_id')
+      .eq('session_id', sessionId)
+      .eq('campo_id', campoId)
+      .not('lead_id', 'is', null)
+      .limit(1)
+      .maybeSingle()
+
     await supabaseAdmin.from('visitas').insert({
       campo_id: campoId,
       session_id: sessionId,
       ip_hash: ipHash,
       user_agent: userAgent,
+      lead_id: prevVisita?.lead_id ?? null,
     })
 
     const res = NextResponse.json({ ok: true })
