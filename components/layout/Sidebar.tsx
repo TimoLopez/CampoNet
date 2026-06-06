@@ -39,27 +39,30 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
       {/* Close button — mobile only */}
       <button
         onClick={onClose}
-        className="md:hidden absolute top-3 right-3 text-white/50 hover:text-white transition-colors cursor-pointer"
+        className="md:hidden absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-md text-white/40 hover:text-white hover:bg-white/8 transition-all duration-150 cursor-pointer"
         aria-label="Cerrar menú"
       >
-        <X className="h-5 w-5" />
+        <X className="h-4 w-4" />
       </button>
 
       {/* Logo */}
-      <div className="px-5 py-6 border-b border-white/10">
+      <div className="px-5 py-5 border-b border-white/8">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#C49A3C]/20 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-[#C49A3C]/20 ring-1 ring-[#C49A3C]/20 flex items-center justify-center shrink-0">
             <Sprout className="h-4 w-4 text-[#C49A3C]" />
           </div>
-          <span className="text-[15px] font-semibold text-white tracking-wide">
-            Campo<span className="text-[#C49A3C]">Net</span>
-          </span>
+          <div>
+            <span className="text-[15px] font-semibold text-white tracking-wide">
+              Campo<span className="text-[#C49A3C]">Net</span>
+            </span>
+            <p className="text-[10px] text-white/30 leading-none mt-0.5">Uruguay</p>
+          </div>
         </div>
       </div>
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest px-3 pb-2">
+        <p className="text-[11px] font-semibold text-white/25 uppercase tracking-widest px-3 pb-2.5">
           Gestión
         </p>
         {navItems.map(({ href, label, icon: Icon, exact }) => {
@@ -70,10 +73,10 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
               href={href}
               onClick={onClose}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer group',
+                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer group relative',
                 isActive
-                  ? 'bg-[#C49A3C]/12 text-[#E8C96A] border border-[#C49A3C]/20'
-                  : 'text-white/55 hover:bg-white/6 hover:text-white/90 border border-transparent'
+                  ? 'bg-[#C49A3C]/10 text-[#E8C96A] border-l-2 border-[#C49A3C] pl-[10px]'
+                  : 'text-white/55 hover:bg-white/8 hover:text-white border-l-2 border-transparent pl-[10px]'
               )}
             >
               <Icon
@@ -83,19 +86,16 @@ export default function Sidebar({ mobileOpen = false, onClose }: SidebarProps) {
                 )}
               />
               <span>{label}</span>
-              {isActive && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#C49A3C] shrink-0" />
-              )}
             </Link>
           )
         })}
       </nav>
 
       {/* Footer / Logout */}
-      <div className="px-3 py-4 border-t border-white/10">
+      <div className="px-3 py-4 border-t border-white/8">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-medium text-white/40 hover:bg-red-500/10 hover:text-red-400 transition-all duration-150 cursor-pointer"
+          className="flex items-center gap-3 px-3 py-2.5 pl-[10px] w-full rounded-lg text-sm font-medium text-white/35 hover:bg-red-950/30 hover:text-red-400 transition-all duration-200 cursor-pointer border-l-2 border-transparent"
         >
           <LogOut className="h-4 w-4 shrink-0" />
           Cerrar sesión
