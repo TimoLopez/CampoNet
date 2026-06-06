@@ -18,6 +18,7 @@ import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import GaleriaFotos from './GaleriaFotos'
 import type { Campo } from '@/lib/types'
+import VoiceRecorder, { type CampoVozFields } from './VoiceRecorder'
 
 const MapboxPicker = dynamic(() => import('./MapboxPicker'), { ssr: false })
 
@@ -33,7 +34,7 @@ const schema = z.object({
   departamento: z.string().min(1, 'Seleccioná un departamento'),
   hectareas: z.coerce.number().positive('Debe ser mayor a 0'),
   tipo: z.enum(['ganadero', 'agricola', 'forestal', 'mixto']).optional(),
-  precio_usd: z.coerce.number().positive().optional().or(z.literal(undefined)),
+  precio_usd: z.preprocess(v => (!v && v !== 0 ? undefined : Number(v)), z.number().positive().optional()),
   descripcion: z.string().optional(),
   agua: z.boolean(),
   acceso_ruta: z.boolean(),
@@ -55,6 +56,7 @@ export default function CampoForm({ initialData }: Props) {
   const [campoId] = useState(() => initialData?.id ?? crypto.randomUUID())
   const [generatingAI, setGeneratingAI] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [transcripcion, setTranscripcion] = useState<string | null>(null)
 
   const { register, handleSubmit, control, watch, setValue, getValues, formState: { errors } } = useForm<FormData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,6 +80,16 @@ export default function CampoForm({ initialData }: Props) {
 
   const fotos = watch('fotos')
 
+  function handleFieldsExtracted(fields: CampoVozFields) {
+    if (fields.titulo) setValue('titulo', fields.titulo)
+    if (fields.departamento) setValue('departamento', fields.departamento)
+    if (fields.hectareas) setValue('hectareas', fields.hectareas)
+    if (fields.tipo) setValue('tipo', fields.tipo)
+    if (fields.precio_usd) setValue('precio_usd', fields.precio_usd)
+    if (fields.agua !== undefined && fields.agua !== null) setValue('agua', fields.agua)
+    if (fields.acceso_ruta !== undefined && fields.acceso_ruta !== null) setValue('acceso_ruta', fields.acceso_ruta)
+  }
+
   async function generateDescription() {
     const { titulo, hectareas, departamento, tipo, precio_usd, agua, acceso_ruta } = getValues()
     if (!titulo || !departamento || !hectareas) {
@@ -89,7 +101,7 @@ export default function CampoForm({ initialData }: Props) {
       const res = await fetch('/api/ia/generar-descripcion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ titulo, hectareas, departamento, tipo, precio_usd, agua, acceso_ruta }),
+        body: JSON.stringify({ titulo, hectareas, departamento, tipo, precio_usd, agua, acceso_ruta, transcripcion }),
       })
       const json = await res.json()
       if (json.descripcion) {
@@ -148,6 +160,10 @@ export default function CampoForm({ initialData }: Props) {
 
   return (
     <form className="space-y-6 max-w-2xl">
+      <VoiceRecorder
+        onFieldsExtracted={handleFieldsExtracted}
+        onTranscripcionReady={texto => setTranscripcion(texto)}
+      />
       {/* Datos básicos */}
       <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-4">
         <h2 className="font-semibold text-[#1A1A12]">Datos básicos</h2>
