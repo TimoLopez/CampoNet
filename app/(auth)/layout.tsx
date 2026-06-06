@@ -4,18 +4,20 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Grain texture overlay */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.025]"
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E")`,
           backgroundRepeat: 'repeat',
         }}
       />
+      {/* Green blob — top right */}
+      <div aria-hidden className="pointer-events-none absolute top-0 right-0 w-[500px] h-[500px] bg-[#2D5018]/8 rounded-full blur-3xl -translate-y-1/3 translate-x-1/4" />
+      {/* Gold blob — bottom left */}
+      <div aria-hidden className="pointer-events-none absolute bottom-0 left-0 w-96 h-96 bg-[#C49A3C]/8 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4" />
+      {/* Gold blob — bottom right */}
+      <div aria-hidden className="pointer-events-none absolute bottom-0 right-0 w-64 h-64 bg-[#C49A3C]/5 rounded-full blur-2xl translate-y-1/4 translate-x-1/4" />
 
-      {/* Subtle campo gradient blobs */}
-      <div aria-hidden className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-[#2D5018]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
-      <div aria-hidden className="pointer-events-none absolute bottom-0 left-0 w-80 h-80 bg-[#C49A3C]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
-
-      <div className="relative w-full max-w-md">
+      <div className="relative w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Brand */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#1C3311] mb-4 shadow-lg">
@@ -24,8 +26,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               <path d="M12 8v6M9 11l3-3 3 3" stroke="#F7F5F0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#1A1A12]">
-            Campo<span className="text-[#2D5018] font-bold">Net</span>
+          <h1 className="text-2xl font-bold tracking-tight text-[#1A1A12]">
+            Campo<span className="text-[#2D5018]">Net</span>
           </h1>
           <p className="text-sm text-[#5C5B4F] mt-1.5">Panel de escritorios rurales · Uruguay</p>
         </div>
