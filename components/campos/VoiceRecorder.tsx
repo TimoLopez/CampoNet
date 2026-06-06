@@ -67,12 +67,16 @@ export default function VoiceRecorder({ onFieldsExtracted, onTranscripcionReady 
         setStatus('processing')
         try {
           const formData = new FormData()
-          formData.append('audio', blob, 'audio.webm')
+          const ext = mimeTypeRef.current.includes('mp4') ? 'mp4' : 'webm'
+          formData.append('audio', blob, `audio.${ext}`)
           const res = await fetch('/api/ia/transcribir', { method: 'POST', body: formData })
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}))
+            throw new Error((err as any).error ?? 'transcription failed')
+          }
           const json = await res.json()
           if (!json.texto) throw new Error('no text')
           setTexto(json.texto)
-          onTranscripcionReady(json.texto)
           setStatus('done')
         } catch {
           toast.error('Error al transcribir el audio.')
@@ -102,8 +106,12 @@ export default function VoiceRecorder({ onFieldsExtracted, onTranscripcionReady 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ transcripcion: texto }),
       })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error((err as any).error ?? 'interpretation failed')
+      }
       const campos: CampoVozFields = await res.json()
-      if ((campos as any).error) throw new Error((campos as any).error)
+      onTranscripcionReady(texto)
       onFieldsExtracted(campos)
       toast.success('Campos rellenados con la transcripción.')
       setStatus('idle')
