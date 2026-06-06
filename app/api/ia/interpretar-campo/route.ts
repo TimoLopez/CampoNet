@@ -13,11 +13,15 @@ export async function POST(request: Request) {
   try {
     const { transcripcion } = await request.json()
     if (!transcripcion) return Response.json({ error: 'transcripcion required' }, { status: 400 })
+    if (typeof transcripcion !== 'string' || transcripcion.length > 4000) {
+      return Response.json({ error: 'transcripcion must be a string under 4000 characters' }, { status: 400 })
+    }
 
     const completion = await openai.chat.completions.create(
       {
         model: 'gpt-4o-mini',
         temperature: 0,
+        max_tokens: 300,
         messages: [
           {
             role: 'system',
