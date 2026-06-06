@@ -72,7 +72,7 @@ export default function LeadRow({ lead }: Props) {
         </div>
       </td>
       <td className="px-4 py-3">
-        <Select value={estado} onValueChange={handleEstado}>
+        <Select value={estado} onValueChange={v => handleEstado(v as EstadoLead)}>
           <SelectTrigger className={`h-7 w-36 text-xs border ${ESTADO_STYLE[estado]}`}>
             <SelectValue />
           </SelectTrigger>

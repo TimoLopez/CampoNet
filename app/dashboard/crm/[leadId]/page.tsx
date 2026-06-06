@@ -40,7 +40,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
 
   const { data: visitas } = await supabase
     .from('visitas')
-    .select('id, created_at, user_agent')
+    .select('id, created_at')
     .eq('lead_id', leadId)
     .order('created_at', { ascending: false })
 
