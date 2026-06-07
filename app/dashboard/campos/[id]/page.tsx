@@ -35,7 +35,7 @@ export default async function EditarCampoPage({ params }: { params: Promise<{ id
             <ArrowLeft className="h-4 w-4" />
             Volver a mis campos
           </Link>
-          <h1 className="text-2xl font-bold text-[#1A1A12] mt-2">Editar campo</h1>
+          <h1 className="text-2xl font-bold text-[#1A1A12] mt-2 tracking-tight">Editar campo</h1>
         </div>
         <ArchiveCampoButton campoId={id} estado={campo.estado} tieneLeads={(leadsCount ?? 0) > 0} />
       </div>

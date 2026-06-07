@@ -10,16 +10,16 @@ export default function DashboardShell({ children }: { children: React.ReactNode
   return (
     <div className="flex h-screen bg-[#F2EFE8] overflow-hidden">
       {/* Mobile header — hidden on md+ */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-[#1C3311] flex items-center px-4 gap-3 border-b border-white/10">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-[#1C3311]/96 backdrop-blur-md flex items-center px-4 gap-3 border-b border-white/8 shadow-[0_1px_0_0_rgba(255,255,255,0.05)]">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="text-white/70 hover:text-white transition-colors cursor-pointer"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all duration-150 cursor-pointer"
           aria-label="Abrir menú"
         >
           <Menu className="h-5 w-5" />
         </button>
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#C49A3C]/20 flex items-center justify-center">
+          <div className="w-6 h-6 rounded-md bg-[#C49A3C]/20 ring-1 ring-[#C49A3C]/20 flex items-center justify-center">
             <Sprout className="h-3.5 w-3.5 text-[#C49A3C]" />
           </div>
           <span className="text-[14px] font-semibold text-white tracking-wide">
@@ -31,7 +31,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       {/* Backdrop — mobile only, shown when sidebar open */}
       {sidebarOpen && (
         <div
-          className="md:hidden fixed inset-0 z-40 bg-black/50"
+          className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
           onClick={() => setSidebarOpen(false)}
         />
       )}

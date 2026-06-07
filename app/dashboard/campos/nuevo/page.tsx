@@ -13,7 +13,7 @@ export default function NuevoCampoPage() {
           <ArrowLeft className="h-4 w-4" />
           Volver a mis campos
         </Link>
-        <h1 className="text-2xl font-bold text-[#1A1A12] mt-2">Publicar nuevo campo</h1>
+        <h1 className="text-2xl font-bold text-[#1A1A12] mt-2 tracking-tight">Publicar nuevo campo</h1>
       </div>
       <CampoForm />
     </div>

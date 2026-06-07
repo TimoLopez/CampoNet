@@ -12,7 +12,7 @@ interface Props {
 export default function NotasLead({ leadId, initialNotas }: Props) {
   const [notas, setNotas] = useState(initialNotas ?? '')
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
-  const timerRef = useRef<ReturnType<typeof setTimeout>>()
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   function handleChange(value: string) {
     setNotas(value)

@@ -30,7 +30,7 @@ export default function CrmFilters({ campos }: Props) {
     <div className="flex items-center gap-3 flex-wrap">
       <Select
         value={estadoFilter}
-        onValueChange={v => update('estado', v)}
+        onValueChange={v => v && update('estado', v)}
       >
         <SelectTrigger className="w-44 h-8 text-sm">
           <SelectValue placeholder="Todos los estados" />
@@ -47,7 +47,7 @@ export default function CrmFilters({ campos }: Props) {
 
       <Select
         value={campoFilter}
-        onValueChange={v => update('campo', v)}
+        onValueChange={v => v && update('campo', v)}
       >
         <SelectTrigger className="w-52 h-8 text-sm">
           <SelectValue placeholder="Todos los campos" />

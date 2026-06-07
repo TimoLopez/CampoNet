@@ -6,7 +6,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import dynamic from 'next/dynamic'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, MapPin, FileText, ImageIcon, Map, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -165,8 +165,11 @@ export default function CampoForm({ initialData }: Props) {
         onTranscripcionReady={texto => setTranscripcion(texto)}
       />
       {/* Datos básicos */}
-      <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-4">
-        <h2 className="font-semibold text-[#1A1A12]">Datos básicos</h2>
+      <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-4 shadow-[var(--shadow-card)]">
+        <div className="flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-[#C49A3C]" />
+          <h2 className="text-sm font-semibold text-[#1A1A12]">Datos básicos</h2>
+        </div>
         <Separator className="bg-[#E2DFD6]" />
 
         <div className="space-y-1">
@@ -253,9 +256,12 @@ export default function CampoForm({ initialData }: Props) {
       </div>
 
       {/* Descripción */}
-      <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-4">
+      <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-4 shadow-[var(--shadow-card)]">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-[#1A1A12]">Descripción</h2>
+          <div className="flex items-center gap-2">
+            <FileText className="h-4 w-4 text-[#C49A3C]" />
+            <h2 className="text-sm font-semibold text-[#1A1A12]">Descripción</h2>
+          </div>
           <Button
             type="button"
             variant="outline"
@@ -277,8 +283,11 @@ export default function CampoForm({ initialData }: Props) {
       </div>
 
       {/* Fotos y video */}
-      <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-4">
-        <h2 className="font-semibold text-[#1A1A12]">Fotos y video</h2>
+      <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-4 shadow-[var(--shadow-card)]">
+        <div className="flex items-center gap-2">
+          <ImageIcon className="h-4 w-4 text-[#C49A3C]" />
+          <h2 className="text-sm font-semibold text-[#1A1A12]">Fotos y video</h2>
+        </div>
         <Separator className="bg-[#E2DFD6]" />
         <Controller
           name="fotos"
@@ -295,8 +304,11 @@ export default function CampoForm({ initialData }: Props) {
       </div>
 
       {/* Ubicación */}
-      <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-4">
-        <h2 className="font-semibold text-[#1A1A12]">Ubicación en el mapa</h2>
+      <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-4 shadow-[var(--shadow-card)]">
+        <div className="flex items-center gap-2">
+          <Map className="h-4 w-4 text-[#C49A3C]" />
+          <h2 className="text-sm font-semibold text-[#1A1A12]">Ubicación en el mapa</h2>
+        </div>
         <Separator className="bg-[#E2DFD6]" />
         <Controller
           name="lat"
@@ -321,13 +333,13 @@ export default function CampoForm({ initialData }: Props) {
       </div>
 
       {/* Acciones */}
-      <div className="flex items-center gap-3 pb-8">
+      <div className="flex items-center gap-3 pb-8 pt-1">
         <Button
           type="button"
           variant="outline"
           disabled={loading}
           onClick={handleSubmit((data: any) => save(data, false))}
-          className="cursor-pointer"
+          className="border-[#E2DFD6] text-[#5C5B4F] hover:text-[#1A1A12] hover:border-[#C49A3C]/40 hover:bg-[#F7F5F0] cursor-pointer transition-all duration-150"
         >
           Guardar borrador
         </Button>
@@ -335,9 +347,12 @@ export default function CampoForm({ initialData }: Props) {
           type="button"
           disabled={loading}
           onClick={handleSubmit((data: any) => save(data, true))}
-          className="bg-[#1C3311] hover:bg-[#254516] cursor-pointer"
+          className="bg-[#1C3311] hover:bg-[#254516] active:scale-[0.98] cursor-pointer shadow-sm transition-all duration-150 font-semibold"
         >
-          {loading ? 'Guardando...' : 'Publicar campo'}
+          {loading
+            ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Guardando...</>
+            : 'Publicar campo'
+          }
         </Button>
       </div>
     </form>

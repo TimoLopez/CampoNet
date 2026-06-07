@@ -24,8 +24,11 @@ export default async function PerfilPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-[#1A1A12] mb-6">Mi Perfil</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-[#1A1A12] tracking-tight">Mi Perfil</h1>
+        <p className="text-sm text-[#5C5B4F] mt-0.5">Información de tu escritorio rural</p>
+      </div>
       <PerfilForm escritorio={escritorio} userEmail={user!.email!} />
     </div>
   )
