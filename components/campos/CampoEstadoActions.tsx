@@ -53,6 +53,7 @@ export default function CampoEstadoActions({ campoId, estado, leadsCount }: Prop
     setArchiveOpen(false)
     setSoldOpen(false)
     setReactivateOpen(false)
+    setDeleteOpen(false)
     router.push('/dashboard/campos')
     router.refresh()
   }
@@ -109,7 +110,7 @@ export default function CampoEstadoActions({ campoId, estado, leadsCount }: Prop
                   disabled={loading}
                   className="bg-[#1C3311] hover:bg-[#254516] cursor-pointer"
                 >
-                  {loading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Guardando...</> : 'Reactivar'}
+                  {loading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Reactivando...</> : 'Reactivar'}
                 </Button>
               </DialogFooter>
             </DialogContent>
