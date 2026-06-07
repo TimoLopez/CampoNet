@@ -5,11 +5,11 @@ import { ArrowLeft, Mail, Phone, MessageSquare, Flame, MapPin, Calendar } from '
 import NotasLead from './NotasLead'
 
 const ESTADO_STYLE: Record<string, string> = {
-  nuevo:       'bg-blue-50 text-blue-700 border-blue-200',
-  contactado:  'bg-yellow-50 text-yellow-700 border-yellow-200',
-  negociacion: 'bg-purple-50 text-purple-700 border-purple-200',
-  cerrado:     'bg-green-50 text-green-700 border-green-200',
-  descartado:  'bg-gray-100 text-gray-500 border-gray-200',
+  nuevo:       'bg-[#EEF4FF] text-[#2563EB] border-[#BFDBFE]',
+  contactado:  'bg-[#FFFBEB] text-[#92400E] border-[#FDE68A]',
+  negociacion: 'bg-[#F3EFF9] text-[#6D28D9] border-[#DDD6FE]',
+  cerrado:     'bg-[#F0FDF4] text-[#166534] border-[#BBF7D0]',
+  descartado:  'bg-[#F9F9F9] text-[#6B7280] border-[#E5E7EB]',
 }
 
 const ESTADO_LABEL: Record<string, string> = {
@@ -54,14 +54,16 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
       <div>
         <Link
           href="/dashboard/crm"
-          className="inline-flex items-center gap-1.5 text-sm text-[#5C5B4F] hover:text-[#1A1A12] transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-sm text-[#5C5B4F] hover:text-[#1A1A12] hover:underline underline-offset-2 transition-colors cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
           Volver a leads
         </Link>
+        <div className="w-8 h-0.5 bg-[#C49A3C]/40 mt-2 rounded-full" />
         <div className="flex items-center gap-3 mt-2">
           <h1 className="text-2xl font-bold text-[#1A1A12]">{lead.nombre}</h1>
           {esCaliente && <Flame className="h-5 w-5 text-orange-500" />}
+          <div className="w-px h-5 bg-[#E2DFD6]" />
           <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${ESTADO_STYLE[lead.estado]}`}>
             {ESTADO_LABEL[lead.estado]}
           </span>
@@ -75,18 +77,18 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
       </div>
 
       {/* Datos de contacto */}
-      <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-3">
+      <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-3 shadow-[0_1px_3px_0_rgba(28,51,17,0.04)]">
         <h2 className="font-semibold text-[#1A1A12] text-sm">Datos de contacto</h2>
         {lead.email && (
           <div className="flex items-center gap-2 text-sm text-[#5C5B4F]">
             <Mail className="h-4 w-4 shrink-0" />
-            <a href={`mailto:${lead.email}`} className="hover:text-[#1A1A12] transition-colors">{lead.email}</a>
+            <a href={`mailto:${lead.email}`} className="hover:text-[#1C3311] hover:underline underline-offset-2 transition-colors">{lead.email}</a>
           </div>
         )}
         {lead.telefono && (
           <div className="flex items-center gap-2 text-sm text-[#5C5B4F]">
             <Phone className="h-4 w-4 shrink-0" />
-            <a href={`tel:${lead.telefono}`} className="hover:text-[#1A1A12] transition-colors">{lead.telefono}</a>
+            <a href={`tel:${lead.telefono}`} className="hover:text-[#1C3311] hover:underline underline-offset-2 transition-colors">{lead.telefono}</a>
           </div>
         )}
         {lead.mensaje && (
@@ -108,7 +110,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
 
       {/* Historial de visitas */}
       <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-3">
-        <div className="flex items-center justify-between">
+        <div className={`flex items-center justify-between ${esCaliente ? 'bg-orange-50 rounded-lg px-3 py-2 -mx-3' : ''}`}>
           <h2 className="font-semibold text-[#1A1A12] text-sm">
             Historial de visitas
             {esCaliente && (
@@ -125,7 +127,10 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
           <div className="space-y-2">
             {visitas.map(v => (
               <div key={v.id} className="flex items-center justify-between py-2 border-b border-[#F2EFE8] last:border-0">
-                <p className="text-sm text-[#1A1A12]">{formatDate(v.created_at)}</p>
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C49A3C]/60 shrink-0" />
+                  <p className="text-sm text-[#1A1A12]">{formatDate(v.created_at)}</p>
+                </div>
                 {new Date(v.created_at) > cutoff && (
                   <span className="text-xs text-orange-500 font-medium">últimos 14 días</span>
                 )}

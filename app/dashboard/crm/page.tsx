@@ -77,7 +77,10 @@ export default async function CrmPage({ searchParams }: PageProps) {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-[#1A1A12]">CRM — Leads</h1>
-          <p className="text-sm text-[#5C5B4F] mt-0.5">{rows.length} lead{rows.length !== 1 ? 's' : ''}</p>
+          <div className="w-8 h-0.5 bg-[#C49A3C]/40 mt-2 rounded-full" />
+          <p className="text-sm text-[#5C5B4F] mt-1.5">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#F2EFE8] text-xs font-medium text-[#5C5B4F] border border-[#E2DFD6]">{rows.length} lead{rows.length !== 1 ? 's' : ''}</span>
+          </p>
         </div>
         <Suspense>
           <CrmFilters campos={campos ?? []} />
@@ -85,20 +88,23 @@ export default async function CrmPage({ searchParams }: PageProps) {
       </div>
 
       {rows.length === 0 ? (
-        <div className="bg-white rounded-xl border border-dashed border-[#C49A3C]/40 p-12 text-center">
+        <div
+          className="bg-white rounded-xl border border-dashed border-[#C49A3C]/40 p-12 text-center"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(196,154,60,0.03) 0%, transparent 70%)' }}
+        >
           <p className="text-[#5C5B4F]">
             {estado || campo ? 'No hay leads con esos filtros.' : 'Todavía no recibiste ninguna consulta.'}
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-[#E2DFD6] overflow-hidden">
+        <div className="bg-white rounded-xl border border-[#E2DFD6] overflow-hidden shadow-[0_1px_3px_0_rgba(28,51,17,0.06)]">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#E2DFD6] bg-[#F7F5F0]">
-                <th className="px-4 py-2.5 text-left text-xs font-medium text-[#5C5B4F]">Lead</th>
-                <th className="px-4 py-2.5 text-left text-xs font-medium text-[#5C5B4F]">Estado</th>
-                <th className="px-4 py-2.5 text-left text-xs font-medium text-[#5C5B4F]">Visitas</th>
-                <th className="px-4 py-2.5 text-left text-xs font-medium text-[#5C5B4F]">Consulta</th>
+              <tr className="border-b border-[#E2DFD6] bg-[#F2EFE8]">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#1A1A12]">Lead</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#1A1A12]">Estado</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#1A1A12]">Visitas</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-[#1A1A12]">Consulta</th>
                 <th className="px-4 py-2.5" />
               </tr>
             </thead>

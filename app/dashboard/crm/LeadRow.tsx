@@ -59,14 +59,14 @@ export default function LeadRow({ lead }: Props) {
   }
 
   return (
-    <tr className={`border-b border-[#F2EFE8] hover:bg-[#F7F5F0] transition-colors ${estado === 'nuevo' ? 'bg-blue-50/40' : 'bg-white'}`}>
+    <tr className={`group border-b border-[#F2EFE8] hover:bg-[#F9F8F5] transition-colors ${lead.es_caliente ? 'border-l-2 border-orange-400/60' : ''} ${estado === 'nuevo' ? 'bg-blue-50/40' : 'bg-white'}`}>
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
           {lead.es_caliente && <Flame className="h-4 w-4 text-orange-500 shrink-0" />}
           <div>
-            <p className="font-medium text-[#1A1A12] text-sm">{lead.nombre}</p>
+            <p className="font-semibold text-[#1A1A12] text-sm">{lead.nombre}</p>
             {lead.campo_titulo && (
-              <p className="text-xs text-[#5C5B4F] truncate max-w-[200px]">{lead.campo_titulo}</p>
+              <p className="text-xs text-[#5C5B4F] truncate max-w-[200px] before:content-['·'] before:mr-1 before:text-[#C2BFB5]">{lead.campo_titulo}</p>
             )}
           </div>
         </div>
@@ -83,11 +83,12 @@ export default function LeadRow({ lead }: Props) {
           </SelectContent>
         </Select>
       </td>
-      <td className="px-4 py-3 text-sm text-[#5C5B4F]">
+      <td className="px-4 py-3 text-sm">
         <div className="flex items-center gap-1.5">
-          <span className="font-medium text-[#1A1A12]">{lead.total_visitas}</span>
+          <span className="font-semibold text-[#1A1A12]">{lead.total_visitas}</span>
+          <span className="text-[#5C5B4F] text-xs">visitas</span>
           {lead.ultima_visita && (
-            <span className="text-xs">· {relativeTime(lead.ultima_visita)}</span>
+            <span className="text-xs text-[#5C5B4F]">· {relativeTime(lead.ultima_visita)}</span>
           )}
         </div>
       </td>
@@ -96,7 +97,7 @@ export default function LeadRow({ lead }: Props) {
       </td>
       <td className="px-4 py-3">
         <Link href={`/dashboard/crm/${lead.id}`} className="text-[#5C5B4F] hover:text-[#1C3311] cursor-pointer">
-          <ArrowRight className="h-4 w-4" />
+          <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-150" />
         </Link>
       </td>
     </tr>
