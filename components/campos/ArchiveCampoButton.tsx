@@ -65,9 +65,9 @@ export default function ArchiveCampoButton({ campoId, estado, tieneLeads }: Prop
             variant="outline"
             size="sm"
             onClick={() => setArchiveOpen(true)}
-            className="gap-1.5 text-[#8B6914] border-[#C49A3C]/40 hover:bg-[#C49A3C]/10 cursor-pointer"
+            className="h-9 gap-1.5 text-[12.5px] font-medium text-[#8B6914] border-[#C49A3C]/40 hover:bg-[#C49A3C]/8 hover:border-[#C49A3C]/60 rounded-xl transition-all duration-150 cursor-pointer"
           >
-            <Archive className="h-4 w-4" />
+            <Archive className="h-3.5 w-3.5" />
             Archivar
           </Button>
           <Dialog open={archiveOpen} onOpenChange={setArchiveOpen}>
@@ -100,7 +100,7 @@ export default function ArchiveCampoButton({ campoId, estado, tieneLeads }: Prop
             variant="outline"
             size="sm"
             onClick={() => setDeleteOpen(true)}
-            className="gap-1.5 text-red-600 border-red-200 hover:bg-red-50 cursor-pointer"
+            className="h-9 gap-1.5 text-[12.5px] font-medium text-red-600 border-red-200/80 hover:bg-red-50 hover:border-red-300 rounded-xl transition-all duration-150 cursor-pointer"
           >
             <Trash2 className="h-4 w-4" />
             Eliminar

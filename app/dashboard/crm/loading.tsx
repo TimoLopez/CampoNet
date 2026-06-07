@@ -1,41 +1,42 @@
-import { Skeleton } from '@/components/ui/skeleton'
+function Sk({ className }: { className?: string }) {
+  return <div className={`skeleton ${className ?? ''}`} aria-hidden />
+}
 
 export default function CrmLoading() {
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex items-start justify-between flex-wrap gap-4">
         <div className="space-y-1.5">
-          <Skeleton className="h-7 w-40" />
-          <Skeleton className="h-4 w-20" />
+          <Sk className="h-8 w-48" />
+          <Sk className="h-4 w-56" />
         </div>
-        {/* Filters skeleton */}
-        <div className="flex gap-2">
-          <Skeleton className="h-9 w-36 rounded-lg" />
-          <Skeleton className="h-9 w-36 rounded-lg" />
+        <div className="flex gap-2.5">
+          <Sk className="h-9 w-40 rounded-xl" />
+          <Sk className="h-9 w-48 rounded-xl" />
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl border border-[#E2DFD6] overflow-hidden">
-        {/* Table header */}
-        <div className="flex items-center gap-4 px-4 py-2.5 border-b border-[#E2DFD6] bg-[#F7F5F0]">
-          <Skeleton className="h-3 w-16" />
-          <Skeleton className="h-3 w-16 ml-auto sm:ml-0" />
-          <Skeleton className="h-3 w-12 hidden sm:block" />
-          <Skeleton className="h-3 w-20 hidden sm:block" />
+      <div className="bg-white rounded-2xl border border-[#E2DFD6] overflow-hidden">
+        {/* Header row */}
+        <div className="flex items-center gap-5 px-5 py-3 border-b border-[#F2EFE8] bg-[#F9F8F5]">
+          <Sk className="h-3 w-10" />
+          <Sk className="h-3 w-12" />
+          <Sk className="h-3 w-10" />
+          <Sk className="h-3 w-14" />
         </div>
-        {/* Rows */}
         {[0, 1, 2, 3, 4, 5].map(i => (
-          <div key={i} className="flex items-center gap-4 px-4 py-3.5 border-b border-[#F2EFE8] last:border-0">
-            <div className="flex-1 space-y-1.5">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-3 w-24" />
+          <div key={i} className="flex items-center gap-5 px-5 py-3.5 border-b border-[#F7F5F0] last:border-0">
+            <div className="flex items-center gap-3 flex-1">
+              <Sk className="w-8 h-8 rounded-full shrink-0" />
+              <div className="space-y-1.5">
+                <Sk className="h-4 w-32" />
+                <Sk className="h-3 w-24" />
+              </div>
             </div>
-            <Skeleton className="h-6 w-24 rounded-full" />
-            <Skeleton className="h-4 w-12 hidden sm:block" />
-            <Skeleton className="h-3.5 w-20 hidden sm:block" />
-            <Skeleton className="h-4 w-4 rounded ml-auto" />
+            <Sk className="h-7 w-32 rounded-full" />
+            <Sk className="h-4 w-16" />
+            <Sk className="h-3.5 w-10" />
+            <Sk className="h-7 w-7 rounded-lg ml-auto" />
           </div>
         ))}
       </div>

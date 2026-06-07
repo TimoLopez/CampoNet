@@ -9,17 +9,18 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
   return (
     <div className="flex h-screen bg-[#F2EFE8] overflow-hidden">
-      {/* Mobile header — hidden on md+ */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-[#1C3311]/96 backdrop-blur-md flex items-center px-4 gap-3 border-b border-white/8 shadow-[0_1px_0_0_rgba(255,255,255,0.05)]">
+
+      {/* ── Mobile header ── */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-[#111D0B]/97 backdrop-blur-md flex items-center px-4 gap-3 border-b border-white/[0.06]">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all duration-150 cursor-pointer"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-all duration-150 cursor-pointer"
           aria-label="Abrir menú"
         >
           <Menu className="h-5 w-5" />
         </button>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#C49A3C]/20 ring-1 ring-[#C49A3C]/20 flex items-center justify-center">
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 rounded-lg bg-[#C49A3C]/15 ring-1 ring-[#C49A3C]/20 flex items-center justify-center">
             <Sprout className="h-3.5 w-3.5 text-[#C49A3C]" />
           </div>
           <span className="text-[14px] font-semibold text-white tracking-wide">
@@ -28,20 +29,20 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         </div>
       </div>
 
-      {/* Backdrop — mobile only, shown when sidebar open */}
+      {/* ── Mobile backdrop ── */}
       {sidebarOpen && (
         <div
-          className="md:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
+          className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-[2px]"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* ── Sidebar ── */}
       <Sidebar mobileOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main content */}
-      <main className="flex-1 overflow-auto pt-14 md:pt-0">
-        <div className="p-6 md:p-8 max-w-7xl mx-auto">
+      {/* ── Main content ── */}
+      <main className="flex-1 overflow-auto pt-14 md:pt-0 scrollbar-thin">
+        <div className="p-6 md:p-8 xl:p-10 max-w-[1200px] mx-auto min-h-full">
           {children}
         </div>
       </main>

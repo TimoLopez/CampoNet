@@ -11,7 +11,6 @@ export default async function PerfilPage() {
     .eq('id', user!.id)
     .single()
 
-  // Fila inexistente (registrado antes del trigger) — crear con datos mínimos
   if (!escritorio) {
     const nombre = user!.email!.split('@')[0]
     await supabase.from('escritorios').insert({ id: user!.id, nombre })
@@ -24,10 +23,10 @@ export default async function PerfilPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7 animate-fade-up">
       <div>
-        <h1 className="text-2xl font-bold text-[#1A1A12] tracking-tight">Mi Perfil</h1>
-        <p className="text-sm text-[#5C5B4F] mt-0.5">Información de tu escritorio rural</p>
+        <h1 className="text-[26px] font-bold text-[#1A1A12] tracking-tight">Mi Perfil</h1>
+        <p className="text-sm text-[#8B8A7E] mt-0.5">Información de tu escritorio rural</p>
       </div>
       <PerfilForm escritorio={escritorio} userEmail={user!.email!} />
     </div>
