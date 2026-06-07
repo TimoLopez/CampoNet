@@ -38,20 +38,25 @@ export default async function CampoPublicoPage({ params }: { params: Promise<{ i
       <div className="min-h-screen bg-[#F7F5F0]">
 
         {/* Navbar mínimo */}
-        <header className="bg-white border-b border-[#E2DFD6] px-6 py-3 flex items-center gap-2">
+        <header className="bg-white/80 backdrop-blur-sm border-b border-[#E2DFD6] px-6 py-3 flex items-center gap-2">
           <Building2 className="h-5 w-5 text-[#1C3311]" />
           <span className="font-semibold text-[#1A1A12] text-sm">CampoNet</span>
         </header>
 
         {/* Hero */}
-        <div className="w-full h-64 md:h-96 bg-[#E2DFD6] overflow-hidden">
+        <div className="relative group w-full h-72 md:h-[420px] bg-[#E2DFD6] overflow-hidden">
           {primeraFoto ? (
-            <img src={primeraFoto} alt={campo.titulo} className="w-full h-full object-cover" />
+            <img
+              src={primeraFoto}
+              alt={campo.titulo}
+              className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-700"
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <MapPin className="h-20 w-20 text-[#C2BFB5]" />
             </div>
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
         </div>
 
         <div className="max-w-5xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -66,14 +71,20 @@ export default async function CampoPublicoPage({ params }: { params: Promise<{ i
                 <span>{campo.departamento}</span>
                 {campo.tipo && <><span>·</span><span>{TIPO_LABEL[campo.tipo] ?? campo.tipo}</span></>}
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-[#1A1A12]" style={{ fontFamily: 'var(--font-playfair)' }}>
+              <h1
+                className="text-3xl md:text-4xl font-bold text-[#1A1A12] tracking-tight leading-tight"
+                style={{ fontFamily: 'var(--font-playfair)' }}
+              >
                 {campo.titulo}
               </h1>
               {campo.precio_usd && (
-                <div className="flex items-baseline gap-2 mt-2">
-                  <p className="text-2xl font-semibold text-[#1C3311]">
-                    USD {Number(campo.precio_usd).toLocaleString('es-UY')}
-                  </p>
+                <div className="flex items-baseline gap-2 mt-3">
+                  <div className="inline-flex items-baseline gap-1.5 bg-[#1C3311]/5 rounded-xl px-4 py-2.5 border border-[#1C3311]/10">
+                    <span className="text-sm font-medium text-[#1C3311]/60">USD</span>
+                    <p className="text-2xl font-semibold text-[#1C3311]">
+                      {Number(campo.precio_usd).toLocaleString('es-UY')}
+                    </p>
+                  </div>
                   {campo.precio_ha_usd && (
                     <p className="text-sm text-[#5C5B4F]">
                       · USD {Math.round(Number(campo.precio_ha_usd)).toLocaleString('es-UY')}/ha
@@ -84,28 +95,28 @@ export default async function CampoPublicoPage({ params }: { params: Promise<{ i
             </div>
 
             {/* Stats clave */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="bg-white rounded-xl border border-[#E2DFD6] p-4 text-center">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 rounded-xl">
+              <div className="bg-[#F7F5F0] rounded-xl border border-[#E2DFD6] p-4 text-center shadow-[inset_0_1px_2px_rgba(28,51,17,0.04)]">
                 <Ruler className="h-5 w-5 text-[#8B6914] mx-auto mb-1" />
                 <p className="text-xl font-bold text-[#1A1A12]">{campo.hectareas}</p>
                 <p className="text-xs text-[#5C5B4F]">hectáreas</p>
               </div>
               {campo.agua && (
-                <div className="bg-white rounded-xl border border-[#E2DFD6] p-4 text-center">
+                <div className="bg-[#F7F5F0] rounded-xl border border-[#E2DFD6] p-4 text-center shadow-[inset_0_1px_2px_rgba(28,51,17,0.04)]">
                   <Droplets className="h-5 w-5 text-blue-500 mx-auto mb-1" />
                   <p className="text-sm font-medium text-[#1A1A12]">Agua</p>
                   <p className="text-xs text-[#5C5B4F]">disponible</p>
                 </div>
               )}
               {campo.acceso_ruta && (
-                <div className="bg-white rounded-xl border border-[#E2DFD6] p-4 text-center">
+                <div className="bg-[#F7F5F0] rounded-xl border border-[#E2DFD6] p-4 text-center shadow-[inset_0_1px_2px_rgba(28,51,17,0.04)]">
                   <Route className="h-5 w-5 text-[#2D5018] mx-auto mb-1" />
                   <p className="text-sm font-medium text-[#1A1A12]">Acceso</p>
                   <p className="text-xs text-[#5C5B4F]">por ruta</p>
                 </div>
               )}
               {campo.tipo && (
-                <div className="bg-white rounded-xl border border-[#E2DFD6] p-4 text-center">
+                <div className="bg-[#F7F5F0] rounded-xl border border-[#E2DFD6] p-4 text-center shadow-[inset_0_1px_2px_rgba(28,51,17,0.04)]">
                   <Tag className="h-5 w-5 text-[#8B6914] mx-auto mb-1" />
                   <p className="text-sm font-medium text-[#1A1A12]">{TIPO_LABEL[campo.tipo]}</p>
                   <p className="text-xs text-[#5C5B4F]">tipo</p>
@@ -117,7 +128,9 @@ export default async function CampoPublicoPage({ params }: { params: Promise<{ i
             {campo.descripcion && (
               <div className="bg-white rounded-xl border border-[#E2DFD6] p-6">
                 <h2 className="font-semibold text-[#1A1A12] mb-3">Descripción</h2>
-                <p className="text-[#5C5B4F] leading-relaxed whitespace-pre-line">{campo.descripcion}</p>
+                <div className="pl-4 border-l-2 border-[#C49A3C]/30">
+                  <p className="text-[#5C5B4F] leading-relaxed whitespace-pre-line">{campo.descripcion}</p>
+                </div>
               </div>
             )}
 
@@ -150,7 +163,7 @@ export default async function CampoPublicoPage({ params }: { params: Promise<{ i
             )}
 
             {/* Escritorio */}
-            <div className="bg-white rounded-xl border border-[#E2DFD6] p-5 flex items-center gap-4">
+            <div className="bg-white rounded-xl border border-[#E2DFD6] p-5 flex items-center gap-4 shadow-[0_2px_8px_-2px_rgba(28,51,17,0.08)] hover:shadow-[0_4px_16px_-4px_rgba(28,51,17,0.12)] transition-shadow duration-200">
               {escritorio.logo_url ? (
                 <img
                   src={escritorio.logo_url}
