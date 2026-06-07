@@ -99,14 +99,16 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <p className="text-sm font-medium text-[#8B6914] uppercase tracking-widest mb-1">
+        <p className="text-xs font-semibold text-[#8B6914] uppercase tracking-widest mb-1.5 flex items-center gap-2">
+          <span className="w-4 h-px bg-[#C49A3C]/40" />
           {greeting()}
+          <span className="w-4 h-px bg-[#C49A3C]/40" />
         </p>
         <h1 className="text-3xl font-bold text-[#1A1A12] tracking-tight">
           {escritorio?.nombre ?? 'Mi Escritorio'}
         </h1>
-        <p className="text-[#5C5B4F] mt-1">
-          Resumen de tu actividad en CampoNet
+        <p className="text-[#5C5B4F] mt-1 text-sm">
+          Resumen de actividad · CampoNet
         </p>
       </div>
 
@@ -116,33 +118,34 @@ export default async function DashboardPage() {
           <Link
             key={label}
             href={href}
-            className="group bg-white rounded-xl border border-[#E2DFD6] p-5 flex items-center gap-4 hover:border-[#C49A3C]/40 hover:shadow-md transition-all duration-200 cursor-pointer"
+            className="group bg-white rounded-xl border border-[#E2DFD6] p-5 flex items-center gap-4 hover:border-[#C49A3C]/40 hover:shadow-[0_4px_12px_-2px_rgba(28,51,17,0.1)] transition-all duration-200 cursor-pointer"
           >
-            <div className={`w-11 h-11 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
+            <div className={`w-11 h-11 rounded-xl ${bg} flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105`}>
               <Icon className={`h-5 w-5 ${color}`} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-2xl font-bold text-[#1A1A12]">{value}</p>
-              <p className="text-xs text-[#5C5B4F] truncate">{label}</p>
+              <p className="text-3xl font-bold text-[#1A1A12] leading-none">{value}</p>
+              <p className="text-xs text-[#5C5B4F] truncate mt-1">{label}</p>
             </div>
-            <ArrowRight className="h-4 w-4 text-[#C2BFB5] group-hover:text-[#C49A3C] transition-colors duration-150 shrink-0" />
+            <ArrowRight className="h-4 w-4 text-[#C2BFB5] group-hover:text-[#C49A3C] group-hover:translate-x-0.5 transition-all duration-150 shrink-0" />
           </Link>
         ))}
       </div>
 
       {/* Hot leads */}
       {hotLeads.length > 0 && (
-        <div className="bg-white rounded-xl border border-[#E2DFD6] overflow-hidden">
-          <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#F2EFE8]">
+        <div className="bg-white rounded-xl border border-[#E2DFD6] overflow-hidden shadow-[0_1px_3px_0_rgba(28,51,17,0.06)]">
+          <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#F2EFE8] bg-gradient-to-r from-orange-50/60 to-transparent">
             <Flame className="h-4 w-4 text-orange-500" />
             <h2 className="font-semibold text-[#1A1A12] text-sm">Leads calientes</h2>
+            <span className="ml-auto text-xs text-orange-500/70 font-medium">{hotLeads.length} activo{hotLeads.length !== 1 ? 's' : ''}</span>
           </div>
           <ul>
             {hotLeads.map(lead => (
               <li key={lead.id}>
                 <Link
                   href={`/dashboard/crm/${lead.id}`}
-                  className="flex items-center justify-between px-5 py-3 hover:bg-[#F7F5F0] transition-colors border-b border-[#F2EFE8] last:border-0 cursor-pointer"
+                  className="group flex items-center justify-between px-5 py-3 hover:bg-[#F7F5F0] transition-colors border-b border-[#F2EFE8] last:border-0 cursor-pointer"
                 >
                   <div>
                     <p className="text-sm font-medium text-[#1A1A12]">{lead.nombre}</p>
@@ -154,7 +157,7 @@ export default async function DashboardPage() {
                     <span className="text-xs text-orange-600 font-medium">
                       {lead.visitas} visitas
                     </span>
-                    <ArrowRight className="h-4 w-4 text-[#C2BFB5]" />
+                    <ArrowRight className="h-4 w-4 text-[#C2BFB5] group-hover:text-[#C49A3C] group-hover:translate-x-0.5 transition-all duration-150" />
                   </div>
                 </Link>
               </li>
@@ -165,8 +168,11 @@ export default async function DashboardPage() {
 
       {/* Empty state CTA */}
       {totalCampos === 0 && (
-        <div className="bg-white rounded-xl border border-dashed border-[#C49A3C]/40 p-8 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#1C3311] flex items-center justify-center mx-auto mb-4">
+        <div
+          className="bg-white rounded-xl border border-dashed border-[#C49A3C]/40 p-8 text-center"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(196,154,60,0.04) 0%, transparent 70%)' }}
+        >
+          <div className="w-14 h-14 rounded-2xl bg-[#1C3311] flex items-center justify-center mx-auto mb-4 shadow-md">
             <MapPin className="h-6 w-6 text-[#C49A3C]" />
           </div>
           <h2 className="text-lg font-semibold text-[#1A1A12] mb-1">
@@ -177,7 +183,7 @@ export default async function DashboardPage() {
           </p>
           <Link
             href="/dashboard/campos/nuevo"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#1C3311] text-white text-sm font-medium hover:bg-[#254516] transition-colors duration-150 cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#1C3311] text-white text-sm font-medium hover:bg-[#254516] transition-all duration-150 cursor-pointer shadow-sm hover:shadow-md"
           >
             <Plus className="h-4 w-4" />
             Nuevo campo
