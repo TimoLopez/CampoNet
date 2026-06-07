@@ -6,7 +6,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import dynamic from 'next/dynamic'
-import { Sparkles, MapPin, FileText, ImageIcon, Map, Loader2 } from 'lucide-react'
+import { Sparkles, MapPin, FileText, ImageIcon, Map, Loader2, Droplets, Route } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,7 +14,6 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import GaleriaFotos from './GaleriaFotos'
 import type { Campo } from '@/lib/types'
@@ -51,6 +50,54 @@ interface Props {
   initialData?: Campo
 }
 
+function SectionCard({ icon: Icon, title, children, action }: {
+  icon: React.ElementType
+  title: string
+  children: React.ReactNode
+  action?: React.ReactNode
+}) {
+  return (
+    <div className="bg-white rounded-2xl border border-[#E2DFD6] overflow-hidden shadow-[var(--shadow-card)]">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[#F7F5F0]">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-[#C49A3C]/10 flex items-center justify-center">
+            <Icon className="h-3.5 w-3.5 text-[#8B6914]" />
+          </div>
+          <h2 className="text-[13.5px] font-semibold text-[#1A1A12]">{title}</h2>
+        </div>
+        {action}
+      </div>
+      <div className="p-6 space-y-5">
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function FieldGroup({ children }: { children: React.ReactNode }) {
+  return <div className="space-y-1.5">{children}</div>
+}
+
+function FieldLabel({ htmlFor, children }: { htmlFor?: string; children: React.ReactNode }) {
+  return (
+    <label htmlFor={htmlFor} className="block text-[12.5px] font-medium text-[#2A2A1E]">
+      {children}
+    </label>
+  )
+}
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null
+  return (
+    <p className="text-[11.5px] text-red-500 flex items-center gap-1.5 mt-1">
+      <span className="w-1 h-1 rounded-full bg-red-500 shrink-0" />
+      {message}
+    </p>
+  )
+}
+
+const inputCls = "h-11 rounded-xl border-[#E2DFD6] bg-[#F9F8F5] text-[#1A1A12] text-sm placeholder:text-[#C2BFB5] focus-visible:border-[#C49A3C] focus-visible:ring-2 focus-visible:ring-[#C49A3C]/20 transition-all duration-150"
+
 export default function CampoForm({ initialData }: Props) {
   const router = useRouter()
   const [campoId] = useState(() => initialData?.id ?? crypto.randomUUID())
@@ -59,7 +106,6 @@ export default function CampoForm({ initialData }: Props) {
   const [transcripcion, setTranscripcion] = useState<string | null>(null)
 
   const { register, handleSubmit, control, watch, setValue, getValues, formState: { errors } } = useForm<FormData>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(schema) as any,
     defaultValues: {
       titulo: initialData?.titulo ?? '',
@@ -71,7 +117,7 @@ export default function CampoForm({ initialData }: Props) {
       agua: initialData?.agua ?? false,
       acceso_ruta: initialData?.acceso_ruta ?? false,
       video_url: initialData?.video_url ?? '',
-      estado: (initialData?.estado === 'archivado' ? 'publicado' : initialData?.estado) ?? 'borrador',
+      estado: (initialData?.estado === 'archivado' || initialData?.estado === 'vendido' ? 'publicado' : initialData?.estado) ?? 'borrador',
       lat: initialData?.lat ?? undefined,
       lng: initialData?.lng ?? undefined,
       fotos: initialData?.fotos ?? [],
@@ -106,7 +152,7 @@ export default function CampoForm({ initialData }: Props) {
       const json = await res.json()
       if (json.descripcion) {
         setValue('descripcion', json.descripcion)
-        toast.success('Descripción generada por IA.')
+        toast.success('Descripción generada con IA.')
       } else {
         toast.error('No se pudo generar la descripción.')
       }
@@ -145,10 +191,7 @@ export default function CampoForm({ initialData }: Props) {
         ;({ error } = await supabase.from('campos').insert({ id: campoId, ...payload }))
       }
 
-      if (error) {
-        toast.error('Error al guardar el campo.')
-        return
-      }
+      if (error) { toast.error('Error al guardar el campo.'); return }
 
       toast.success(publicar ? 'Campo publicado.' : 'Borrador guardado.')
       router.push('/dashboard/campos')
@@ -159,34 +202,36 @@ export default function CampoForm({ initialData }: Props) {
   }
 
   return (
-    <form className="space-y-6 max-w-2xl">
+    <form className="space-y-5 max-w-2xl">
+
+      {/* Voice recorder */}
       <VoiceRecorder
         onFieldsExtracted={handleFieldsExtracted}
         onTranscripcionReady={texto => setTranscripcion(texto)}
       />
-      {/* Datos básicos */}
-      <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-4 shadow-[var(--shadow-card)]">
-        <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4 text-[#C49A3C]" />
-          <h2 className="text-sm font-semibold text-[#1A1A12]">Datos básicos</h2>
-        </div>
-        <Separator className="bg-[#E2DFD6]" />
 
-        <div className="space-y-1">
-          <Label htmlFor="titulo">Título del campo *</Label>
-          <Input id="titulo" {...register('titulo')} placeholder="Ej: Campo ganadero en Tacuarembó" />
-          {errors.titulo && <p className="text-sm text-red-500">{errors.titulo.message}</p>}
-        </div>
+      {/* ── Datos básicos ── */}
+      <SectionCard icon={MapPin} title="Datos básicos">
+        <FieldGroup>
+          <FieldLabel htmlFor="titulo">Título del campo *</FieldLabel>
+          <Input
+            id="titulo"
+            {...register('titulo')}
+            placeholder="Ej: Campo ganadero en Tacuarembó"
+            className={inputCls}
+          />
+          <FieldError message={errors.titulo?.message} />
+        </FieldGroup>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <Label>Departamento *</Label>
+          <FieldGroup>
+            <FieldLabel>Departamento *</FieldLabel>
             <Controller
               name="departamento"
               control={control}
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className={inputCls + ' w-full'}>
                     <SelectValue placeholder="Seleccioná..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -195,24 +240,33 @@ export default function CampoForm({ initialData }: Props) {
                 </Select>
               )}
             />
-            {errors.departamento && <p className="text-sm text-red-500">{errors.departamento.message}</p>}
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="hectareas">Hectáreas *</Label>
-            <Input id="hectareas" type="number" step="0.1" min="0" {...register('hectareas')} placeholder="Ej: 250" />
-            {errors.hectareas && <p className="text-sm text-red-500">{errors.hectareas.message}</p>}
-          </div>
+            <FieldError message={errors.departamento?.message} />
+          </FieldGroup>
+
+          <FieldGroup>
+            <FieldLabel htmlFor="hectareas">Hectáreas *</FieldLabel>
+            <Input
+              id="hectareas"
+              type="number"
+              step="0.1"
+              min="0"
+              {...register('hectareas')}
+              placeholder="250"
+              className={inputCls}
+            />
+            <FieldError message={errors.hectareas?.message} />
+          </FieldGroup>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <Label>Tipo de campo</Label>
+          <FieldGroup>
+            <FieldLabel>Tipo de campo</FieldLabel>
             <Controller
               name="tipo"
               control={control}
               render={({ field }) => (
                 <Select value={field.value ?? ''} onValueChange={v => field.onChange(v || undefined)}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className={inputCls + ' w-full'}>
                     <SelectValue placeholder="Seleccioná..." />
                   </SelectTrigger>
                   <SelectContent>
@@ -224,71 +278,92 @@ export default function CampoForm({ initialData }: Props) {
                 </Select>
               )}
             />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="precio_usd">Precio (USD)</Label>
-            <Input id="precio_usd" type="number" min="0" {...register('precio_usd')} placeholder="Opcional" />
-          </div>
+          </FieldGroup>
+
+          <FieldGroup>
+            <FieldLabel htmlFor="precio_usd">Precio (USD)</FieldLabel>
+            <Input
+              id="precio_usd"
+              type="number"
+              min="0"
+              {...register('precio_usd')}
+              placeholder="Opcional"
+              className={inputCls}
+            />
+          </FieldGroup>
         </div>
 
-        <div className="flex gap-6">
-          <div className="flex items-center gap-2">
+        {/* Toggle row */}
+        <div className="flex items-center gap-6 pt-1">
+          <div className="flex items-center gap-3">
             <Controller
               name="agua"
               control={control}
               render={({ field }) => (
-                <Switch checked={field.value} onCheckedChange={field.onChange} id="agua" />
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  id="agua"
+                  className="data-[state=checked]:bg-[#1C3311]"
+                />
               )}
             />
-            <Label htmlFor="agua" className="cursor-pointer">Fuente de agua</Label>
+            <label htmlFor="agua" className="flex items-center gap-1.5 text-[13px] font-medium text-[#2A2A1E] cursor-pointer">
+              <Droplets className="h-3.5 w-3.5 text-blue-500" />
+              Fuente de agua
+            </label>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Controller
               name="acceso_ruta"
               control={control}
               render={({ field }) => (
-                <Switch checked={field.value} onCheckedChange={field.onChange} id="acceso_ruta" />
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  id="acceso_ruta"
+                  className="data-[state=checked]:bg-[#1C3311]"
+                />
               )}
             />
-            <Label htmlFor="acceso_ruta" className="cursor-pointer">Acceso por ruta</Label>
+            <label htmlFor="acceso_ruta" className="flex items-center gap-1.5 text-[13px] font-medium text-[#2A2A1E] cursor-pointer">
+              <Route className="h-3.5 w-3.5 text-[#2D5018]" />
+              Acceso por ruta
+            </label>
           </div>
         </div>
-      </div>
+      </SectionCard>
 
-      {/* Descripción */}
-      <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-4 shadow-[var(--shadow-card)]">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-[#C49A3C]" />
-            <h2 className="text-sm font-semibold text-[#1A1A12]">Descripción</h2>
-          </div>
+      {/* ── Descripción ── */}
+      <SectionCard
+        icon={FileText}
+        title="Descripción"
+        action={
           <Button
             type="button"
             variant="outline"
             size="sm"
             disabled={generatingAI}
             onClick={generateDescription}
-            className="gap-1.5 border-[#C49A3C]/40 text-[#8B6914] hover:bg-[#C49A3C]/10 cursor-pointer"
+            className="h-8 gap-1.5 text-[12px] border-[#C49A3C]/35 text-[#8B6914] hover:bg-[#C49A3C]/8 hover:border-[#C49A3C]/50 transition-all duration-150 cursor-pointer rounded-lg"
           >
-            <Sparkles className="h-3.5 w-3.5" />
-            {generatingAI ? 'Generando...' : 'Generar con IA'}
+            {generatingAI
+              ? <><Loader2 className="h-3 w-3 animate-spin" />Generando...</>
+              : <><Sparkles className="h-3 w-3" />Generar con IA</>
+            }
           </Button>
-        </div>
-        <Separator className="bg-[#E2DFD6]" />
+        }
+      >
         <Textarea
           {...register('descripcion')}
-          placeholder="Describí las características del campo..."
-          rows={5}
+          placeholder="Describí las características del campo: tipo de suelo, instalaciones, accesos, aguadas..."
+          rows={6}
+          className="rounded-xl border-[#E2DFD6] bg-[#F9F8F5] text-sm text-[#1A1A12] placeholder:text-[#C2BFB5] focus-visible:border-[#C49A3C] focus-visible:ring-2 focus-visible:ring-[#C49A3C]/20 transition-all duration-150 resize-none leading-relaxed"
         />
-      </div>
+      </SectionCard>
 
-      {/* Fotos y video */}
-      <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-4 shadow-[var(--shadow-card)]">
-        <div className="flex items-center gap-2">
-          <ImageIcon className="h-4 w-4 text-[#C49A3C]" />
-          <h2 className="text-sm font-semibold text-[#1A1A12]">Fotos y video</h2>
-        </div>
-        <Separator className="bg-[#E2DFD6]" />
+      {/* ── Fotos y video ── */}
+      <SectionCard icon={ImageIcon} title="Fotos y video">
         <Controller
           name="fotos"
           control={control}
@@ -296,20 +371,22 @@ export default function CampoForm({ initialData }: Props) {
             <GaleriaFotos campoId={campoId} fotos={field.value} onChange={field.onChange} />
           )}
         />
-        <div className="space-y-1">
-          <Label htmlFor="video_url">URL de video (YouTube o Vimeo)</Label>
-          <Input id="video_url" {...register('video_url')} placeholder="https://youtube.com/watch?v=..." />
-          {errors.video_url && <p className="text-sm text-red-500">{errors.video_url.message}</p>}
+        <div className="pt-2 border-t border-[#F7F5F0]">
+          <FieldGroup>
+            <FieldLabel htmlFor="video_url">URL de video (YouTube o Vimeo)</FieldLabel>
+            <Input
+              id="video_url"
+              {...register('video_url')}
+              placeholder="https://youtube.com/watch?v=..."
+              className={inputCls}
+            />
+            <FieldError message={errors.video_url?.message} />
+          </FieldGroup>
         </div>
-      </div>
+      </SectionCard>
 
-      {/* Ubicación */}
-      <div className="bg-white rounded-xl border border-[#E2DFD6] p-6 space-y-4 shadow-[var(--shadow-card)]">
-        <div className="flex items-center gap-2">
-          <Map className="h-4 w-4 text-[#C49A3C]" />
-          <h2 className="text-sm font-semibold text-[#1A1A12]">Ubicación en el mapa</h2>
-        </div>
-        <Separator className="bg-[#E2DFD6]" />
+      {/* ── Ubicación ── */}
+      <SectionCard icon={Map} title="Ubicación en el mapa">
         <Controller
           name="lat"
           control={control}
@@ -330,16 +407,16 @@ export default function CampoForm({ initialData }: Props) {
             />
           )}
         />
-      </div>
+      </SectionCard>
 
-      {/* Acciones */}
+      {/* ── Acciones ── */}
       <div className="flex items-center gap-3 pb-8 pt-1">
         <Button
           type="button"
           variant="outline"
           disabled={loading}
           onClick={handleSubmit((data: any) => save(data, false))}
-          className="border-[#E2DFD6] text-[#5C5B4F] hover:text-[#1A1A12] hover:border-[#C49A3C]/40 hover:bg-[#F7F5F0] cursor-pointer transition-all duration-150"
+          className="h-11 rounded-xl border-[#E2DFD6] text-[#5C5B4F] hover:text-[#1A1A12] hover:border-[#C49A3C]/40 hover:bg-[#F7F5F0] transition-all duration-150 cursor-pointer font-medium"
         >
           Guardar borrador
         </Button>
@@ -347,7 +424,7 @@ export default function CampoForm({ initialData }: Props) {
           type="button"
           disabled={loading}
           onClick={handleSubmit((data: any) => save(data, true))}
-          className="bg-[#1C3311] hover:bg-[#254516] active:scale-[0.98] cursor-pointer shadow-sm transition-all duration-150 font-semibold"
+          className="h-11 rounded-xl bg-[#1C3311] hover:bg-[#254516] active:scale-[0.98] text-white font-semibold shadow-[0_2px_8px_-2px_rgba(28,51,17,0.4)] hover:shadow-[0_4px_14px_-4px_rgba(28,51,17,0.5)] transition-all duration-200 cursor-pointer"
         >
           {loading
             ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />Guardando...</>
