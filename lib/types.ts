@@ -1,4 +1,3 @@
-// lib/types.ts
 export type Escritorio = {
   id: string
   nombre: string
@@ -24,7 +23,7 @@ export type Campo = {
   lng: number | null
   fotos: string[]
   video_url: string | null
-  estado: 'publicado' | 'borrador' | 'archivado'
+  estado: 'publicado' | 'borrador' | 'archivado' | 'vendido'
   created_at: string
   updated_at: string
 }
@@ -33,6 +32,7 @@ export type Lead = {
   id: string
   escritorio_id: string
   campo_id: string | null
+  campo_titulo_snapshot: string | null
   nombre: string
   email: string | null
   telefono: string | null
