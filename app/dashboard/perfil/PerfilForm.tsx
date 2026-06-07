@@ -81,7 +81,7 @@ export default function PerfilForm({
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       const ext = file.name.split('.').pop()
-      const path = `logos/${user!.id}.${ext}`
+      const path = `${user!.id}/logo.${ext}`
       const { error: uploadError } = await supabase.storage.from('campo-fotos').upload(path, file, { upsert: true })
       if (uploadError) { toast.error('Error al subir el logo.'); return }
       const { data: { publicUrl } } = supabase.storage.from('campo-fotos').getPublicUrl(path)
