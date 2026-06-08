@@ -75,7 +75,7 @@ export async function deleteCampoWithCleanup(campoId: string, escritorioId: stri
     .single()
 
   if (fetchError || !campo) {
-    const err = new Error('Campo not found') as any
+    const err = new Error('Campo not found') as Error & { code: string }
     err.code = 'NOT_FOUND'
     throw err
   }
