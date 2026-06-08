@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { createClient } from '@supabase/supabase-js'
 import { createHash, randomUUID } from 'crypto'
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { getPrevLeadIdForSession, registerVisita } from '@/lib/dal/visitas'
+import { RegisterVisitaSchema } from '@/lib/schemas/visita'
 
 export async function POST(request: Request) {
   try {
-    const { campoId } = await request.json()
-    if (!campoId) return NextResponse.json({ error: 'campoId required' }, { status: 400 })
+    const body = await request.json()
+    const parsed = RegisterVisitaSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
+    }
+    const { campoId } = parsed.data
 
     const cookieStore = await cookies()
     const existing = cookieStore.get('session_id')?.value
@@ -22,26 +22,11 @@ export async function POST(request: Request) {
     const ipHash = ip ? createHash('sha256').update(ip).digest('hex') : null
     const userAgent = request.headers.get('user-agent') ?? null
 
-    // If this session already has a known lead for this campo, carry it forward
-    const { data: prevVisita } = await supabaseAdmin
-      .from('visitas')
-      .select('lead_id')
-      .eq('session_id', sessionId)
-      .eq('campo_id', campoId)
-      .not('lead_id', 'is', null)
-      .limit(1)
-      .maybeSingle()
+    const prevLeadId = await getPrevLeadIdForSession(sessionId, campoId)
 
-    await supabaseAdmin.from('visitas').insert({
-      campo_id: campoId,
-      session_id: sessionId,
-      ip_hash: ipHash,
-      user_agent: userAgent,
-      lead_id: prevVisita?.lead_id ?? null,
-    })
+    await registerVisita({ campoId, sessionId, ipHash, userAgent, leadId: prevLeadId })
 
     const res = NextResponse.json({ ok: true })
-
     if (isNew) {
       res.cookies.set('session_id', sessionId, {
         maxAge: 60 * 60 * 24 * 90,
@@ -50,9 +35,9 @@ export async function POST(request: Request) {
         httpOnly: true,
       })
     }
-
     return res
-  } catch {
+  } catch (e) {
+    console.error('[POST /api/visitas]', e)
     return NextResponse.json({ error: 'Error registering visit' }, { status: 500 })
   }
 }

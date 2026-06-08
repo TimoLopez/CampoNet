@@ -1,11 +1,7 @@
 import { createClient as createServerClient } from '@/lib/supabase/server'
-import { createClient as createAdminClient } from '@supabase/supabase-js'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
-
-const supabaseAdmin = createAdminClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { updateEscritorioLogo } from '@/lib/dal/escritorios'
 
 export async function POST(req: Request) {
   const supabase = await createServerClient()
@@ -33,7 +29,7 @@ export async function POST(req: Request) {
     .upload(path, buffer, { contentType: file.type, upsert: true })
 
   if (uploadError) {
-    console.error('[POST logo] upload error:', uploadError)
+    console.error('[POST /api/escritorios/logo]', uploadError)
     return NextResponse.json({ error: 'Error al subir el logo' }, { status: 500 })
   }
 
@@ -41,13 +37,10 @@ export async function POST(req: Request) {
     .from('campo-fotos')
     .getPublicUrl(path)
 
-  const { error: updateError } = await supabaseAdmin
-    .from('escritorios')
-    .update({ logo_url: publicUrl })
-    .eq('id', user.id)
-
-  if (updateError) {
-    console.error('[POST logo] update error:', updateError)
+  try {
+    await updateEscritorioLogo(user.id, publicUrl)
+  } catch (e) {
+    console.error('[POST /api/escritorios/logo] db update error:', e)
     return NextResponse.json({ error: 'Error al actualizar el perfil' }, { status: 500 })
   }
 
