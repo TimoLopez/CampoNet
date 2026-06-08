@@ -78,15 +78,12 @@ export default function PerfilForm({
 
     setUploadingLogo(true)
     try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      const ext = file.name.split('.').pop()
-      const path = `${user!.id}/logo.${ext}`
-      const { error: uploadError } = await supabase.storage.from('campo-fotos').upload(path, file, { upsert: true })
-      if (uploadError) { toast.error('Error al subir el logo.'); return }
-      const { data: { publicUrl } } = supabase.storage.from('campo-fotos').getPublicUrl(path)
-      await supabase.from('escritorios').update({ logo_url: publicUrl }).eq('id', user!.id)
-      setLogoUrl(publicUrl)
+      const formData = new FormData()
+      formData.append('file', file)
+      const res = await fetch('/api/escritorios/logo', { method: 'POST', body: formData })
+      const json = await res.json()
+      if (!res.ok) { toast.error(json.error ?? 'Error al subir el logo.'); return }
+      setLogoUrl(json.url)
       toast.success('Logo actualizado.')
     } finally {
       setUploadingLogo(false)
