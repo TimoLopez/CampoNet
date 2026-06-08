@@ -3,6 +3,9 @@ import { Suspense } from 'react'
 import LeadRow from './LeadRow'
 import CrmFilters from './CrmFilters'
 import { Users } from 'lucide-react'
+import { getLeadsByEscritorio } from '@/lib/dal/leads'
+import { getVisitasForLeads, computeVisitStats } from '@/lib/dal/visitas'
+import { getCamposForSelect } from '@/lib/dal/campos'
 
 interface PageProps {
   searchParams: Promise<{ estado?: string; campo?: string }>
@@ -13,60 +16,25 @@ export default async function CrmPage({ searchParams }: PageProps) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  let query = supabase
-    .from('leads')
-    .select('*, campos(titulo)')
-    .eq('escritorio_id', user!.id)
-    .order('created_at', { ascending: false })
+  const [leads, campos] = await Promise.all([
+    getLeadsByEscritorio(user!.id, { estado, campo }),
+    getCamposForSelect(user!.id),
+  ])
 
-  if (estado) query = query.eq('estado', estado)
-  if (campo) query = query.eq('campo_id', campo)
+  const visitas = await getVisitasForLeads(leads.map(l => l.id))
+  const visitStats = computeVisitStats(visitas)
 
-  const { data: leads } = await query
-
-  const leadIds = (leads ?? []).map(l => l.id)
-  const { data: visitas } = leadIds.length > 0
-    ? await supabase
-        .from('visitas')
-        .select('lead_id, created_at')
-        .in('lead_id', leadIds)
-    : { data: [] }
-
-  const cutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)
-
-  type VisitStats = { count: number; ultima: string; esCaliente: boolean }
-  const visitasMap = new Map<string, VisitStats>()
-
-  for (const v of visitas ?? []) {
-    if (!v.lead_id) continue
-    const s = visitasMap.get(v.lead_id) ?? { count: 0, ultima: v.created_at, esCaliente: false }
-    s.count++
-    if (v.created_at > s.ultima) s.ultima = v.created_at
-    visitasMap.set(v.lead_id, s)
-  }
-
-  for (const [leadId, stats] of visitasMap) {
-    const recent = (visitas ?? []).filter(v => v.lead_id === leadId && new Date(v.created_at) > cutoff)
-    stats.esCaliente = recent.length >= 3
-  }
-
-  const { data: campos } = await supabase
-    .from('campos')
-    .select('id, titulo')
-    .eq('escritorio_id', user!.id)
-    .order('titulo')
-
-  const rows = (leads ?? []).map(l => ({
+  const rows = leads.map(l => ({
     id: l.id,
     nombre: l.nombre,
     estado: l.estado,
     created_at: l.created_at,
     campo_id: l.campo_id,
-    campo_titulo: (l.campos as any)?.titulo ?? null,
-    campo_titulo_snapshot: l.campo_titulo_snapshot ?? null,
-    total_visitas: visitasMap.get(l.id)?.count ?? 0,
-    ultima_visita: visitasMap.get(l.id)?.ultima ?? null,
-    es_caliente: visitasMap.get(l.id)?.esCaliente ?? false,
+    campo_titulo: l.campo_titulo,
+    campo_titulo_snapshot: l.campo_titulo_snapshot,
+    total_visitas: visitStats.get(l.id)?.count ?? 0,
+    ultima_visita: visitStats.get(l.id)?.ultima ?? null,
+    es_caliente: visitStats.get(l.id)?.esCaliente ?? false,
   }))
 
   const hotCount = rows.filter(r => r.es_caliente).length
@@ -93,7 +61,7 @@ export default async function CrmPage({ searchParams }: PageProps) {
           <p className="text-sm text-[#8B8A7E] mt-0.5">Consultas recibidas desde tus fichas públicas</p>
         </div>
         <Suspense>
-          <CrmFilters campos={campos ?? []} />
+          <CrmFilters campos={campos} />
         </Suspense>
       </div>
 

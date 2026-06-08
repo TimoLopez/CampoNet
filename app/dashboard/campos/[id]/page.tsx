@@ -4,25 +4,20 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import CampoForm from '@/components/campos/CampoForm'
 import CampoEstadoActions from '@/components/campos/CampoEstadoActions'
+import { getCampoById } from '@/lib/dal/campos'
+import { getLeadCountForCampo } from '@/lib/dal/leads'
 
 export default async function EditarCampoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const { data: campo } = await supabase
-    .from('campos')
-    .select('*')
-    .eq('id', id)
-    .eq('escritorio_id', user!.id)
-    .single()
+  const [campo, leadsCount] = await Promise.all([
+    getCampoById(id, user!.id),
+    getLeadCountForCampo(id),
+  ])
 
   if (!campo) notFound()
-
-  const { count: leadsCount } = await supabase
-    .from('leads')
-    .select('*', { count: 'exact', head: true })
-    .eq('campo_id', id)
 
   return (
     <div className="space-y-7 animate-fade-up">
@@ -41,7 +36,7 @@ export default async function EditarCampoPage({ params }: { params: Promise<{ id
         <CampoEstadoActions
           campoId={id}
           estado={campo.estado}
-          leadsCount={leadsCount ?? 0}
+          leadsCount={leadsCount}
         />
       </div>
       <CampoForm initialData={campo} />

@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Mail, Phone, MessageSquare, Flame, MapPin, Calendar, Clock } from 'lucide-react'
 import NotasLead from './NotasLead'
+import { getLeadById } from '@/lib/dal/leads'
+import { getVisitasForLead } from '@/lib/dal/visitas'
 
 const ESTADO_CONFIG: Record<string, { label: string; dot: string; className: string }> = {
   nuevo:       { label: 'Nuevo',       dot: 'bg-blue-500',   className: 'bg-blue-50 text-blue-700 border-blue-200/80' },
@@ -35,26 +37,15 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const { data: lead } = await supabase
-    .from('leads')
-    .select('*, campos(titulo, departamento)')
-    .eq('id', leadId)
-    .eq('escritorio_id', user!.id)
-    .single()
-
+  const lead = await getLeadById(leadId, user!.id)
   if (!lead) notFound()
 
-  const { data: visitas } = await supabase
-    .from('visitas')
-    .select('id, created_at')
-    .eq('lead_id', leadId)
-    .order('created_at', { ascending: false })
+  const visitas = await getVisitasForLead(leadId)
+  const cutoffDays = 14
+  const cutoff = new Date(Date.now() - cutoffDays * 24 * 60 * 60 * 1000)
+  const esCaliente = visitas.filter(v => new Date(v.created_at) > cutoff).length >= 3
 
-  const cutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)
-  const esCaliente = (visitas ?? []).filter(v => new Date(v.created_at) > cutoff).length >= 3
-
-  const campo = lead.campos as { titulo: string; departamento: string } | null
-  const campoPerdido = !campo && lead.campo_titulo_snapshot
+  const campoPerdido = !lead.campo_titulo && lead.campo_titulo_snapshot
   const estadoConfig = ESTADO_CONFIG[lead.estado] ?? ESTADO_CONFIG.nuevo
 
   return (
@@ -93,10 +84,10 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
                 <span className={`w-1.5 h-1.5 rounded-full ${estadoConfig.dot}`} />
                 {estadoConfig.label}
               </span>
-              {campo && (
+              {lead.campo_titulo && (
                 <span className="flex items-center gap-1.5 text-[12.5px] text-[#8B8A7E]">
                   <MapPin className="h-3.5 w-3.5 shrink-0" />
-                  {campo.titulo} · {campo.departamento}
+                  {lead.campo_titulo}{lead.campo_departamento ? ` · ${lead.campo_departamento}` : ''}
                 </span>
               )}
               {campoPerdido && (

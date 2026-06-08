@@ -1,26 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import PerfilForm from './PerfilForm'
+import { getOrCreateEscritorio } from '@/lib/dal/escritorios'
 
 export default async function PerfilPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  let { data: escritorio } = await supabase
-    .from('escritorios')
-    .select('*')
-    .eq('id', user!.id)
-    .single()
-
-  if (!escritorio) {
-    const nombre = user!.email!.split('@')[0]
-    await supabase.from('escritorios').insert({ id: user!.id, nombre })
-    const { data: created } = await supabase
-      .from('escritorios')
-      .select('*')
-      .eq('id', user!.id)
-      .single()
-    escritorio = created
-  }
+  const escritorio = await getOrCreateEscritorio(user!.id, user!.email!)
 
   return (
     <div className="space-y-7 animate-fade-up">

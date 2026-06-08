@@ -1,19 +1,15 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { Plus, MapPin, LayoutGrid } from 'lucide-react'
+import { Plus, MapPin } from 'lucide-react'
 import CampoCard from '@/components/campos/CampoCard'
+import { getCamposByEscritorio } from '@/lib/dal/campos'
 
 export default async function CamposPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const { data: campos } = await supabase
-    .from('campos')
-    .select('*')
-    .eq('escritorio_id', user!.id)
-    .order('created_at', { ascending: false })
-
-  const count = campos?.length ?? 0
+  const campos = await getCamposByEscritorio(user!.id)
+  const count = campos.length
 
   return (
     <div className="space-y-7 animate-fade-up">
@@ -68,7 +64,7 @@ export default async function CamposPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {campos!.map(campo => (
+          {campos.map(campo => (
             <CampoCard key={campo.id} campo={campo} />
           ))}
         </div>

@@ -1,6 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { MapPin, Users, Eye, Plus, ArrowRight, Flame, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
+import { getCampoIdsForEscritorio } from '@/lib/dal/campos'
+import { getTotalLeadCount, getLeadsBasicoForEscritorio } from '@/lib/dal/leads'
+import { getVisitCountForCampos, getVisitasForLeads, computeVisitStats } from '@/lib/dal/visitas'
+import { getEscritorioNombre } from '@/lib/dal/escritorios'
 
 function greeting() {
   const h = new Date().getHours()
@@ -13,56 +17,32 @@ export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
-  const cutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
+  const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+  const cutoffDays = 14
 
-  const [escritorioRes, camposRes, totalLeadsRes, leadsRes] = await Promise.all([
-    supabase.from('escritorios').select('nombre').eq('id', user!.id).single(),
-    supabase.from('campos').select('id').eq('escritorio_id', user!.id),
-    supabase.from('leads').select('*', { count: 'exact', head: true }).eq('escritorio_id', user!.id),
-    supabase.from('leads').select('id, nombre, campos(titulo)').eq('escritorio_id', user!.id),
+  const [nombreEscritorio, campoIds, totalLeads, leads] = await Promise.all([
+    getEscritorioNombre(user!.id),
+    getCampoIdsForEscritorio(user!.id),
+    getTotalLeadCount(user!.id),
+    getLeadsBasicoForEscritorio(user!.id),
   ])
 
-  const escritorio = escritorioRes.data
-  const campoIds = (camposRes.data ?? []).map(c => c.id)
-  const totalCampos = camposRes.data?.length ?? 0
-  const totalLeads = totalLeadsRes.count ?? 0
-  const leads = leadsRes.data ?? []
-  const leadIds = leads.map(l => l.id)
+  const [visitasMes, visitasRecientes] = await Promise.all([
+    getVisitCountForCampos(campoIds, startOfMonth),
+    getVisitasForLeads(leads.map(l => l.id)),
+  ])
 
-  let visitasMes = 0
-  if (campoIds.length > 0) {
-    const { count } = await supabase
-      .from('visitas')
-      .select('*', { count: 'exact', head: true })
-      .in('campo_id', campoIds)
-      .gte('created_at', startOfMonth)
-    visitasMes = count ?? 0
-  }
+  const visitStats = computeVisitStats(visitasRecientes, cutoffDays)
 
-  let visitasRecientes: { lead_id: string | null }[] = []
-  if (leadIds.length > 0) {
-    const { data } = await supabase
-      .from('visitas')
-      .select('lead_id')
-      .in('lead_id', leadIds)
-      .gte('created_at', cutoff)
-    visitasRecientes = data ?? []
-  }
-
-  const visitCount = new Map<string, number>()
-  for (const v of visitasRecientes) {
-    if (v.lead_id) visitCount.set(v.lead_id, (visitCount.get(v.lead_id) ?? 0) + 1)
-  }
-
+  const totalCampos = campoIds.length
   const hotLeads = leads
-    .filter(l => (visitCount.get(l.id) ?? 0) >= 3)
+    .filter(l => (visitStats.get(l.id)?.count ?? 0) >= 3)
     .slice(0, 5)
     .map(l => ({
       id: l.id,
       nombre: l.nombre,
-      campoTitulo: (l.campos as any)?.titulo ?? null,
-      visitas: visitCount.get(l.id) ?? 0,
+      campoTitulo: l.campo_titulo,
+      visitas: visitStats.get(l.id)?.count ?? 0,
     }))
 
   const stats = [
@@ -112,7 +92,7 @@ export default async function DashboardPage() {
             <span className="h-px w-5 bg-[#C49A3C]/40" aria-hidden />
           </div>
           <h1 className="text-[28px] font-bold text-[#1A1A12] tracking-tight leading-tight">
-            {escritorio?.nombre ?? 'Mi Escritorio'}
+            {nombreEscritorio ?? 'Mi Escritorio'}
           </h1>
           <p className="text-sm text-[#8B8A7E] mt-1">Resumen de actividad · CampoNet</p>
         </div>

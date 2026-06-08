@@ -1,4 +1,3 @@
-import { createClient } from "@supabase/supabase-js"
 import { notFound } from "next/navigation"
 import {
   MapPin,
@@ -22,8 +21,7 @@ import ContactForm from "./ContactForm"
 import VisitTracker from "./VisitTracker"
 import Link from "next/link"
 import MapaWrapper from "./MapaWrapper"
-
-const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+import { getCampoPublico } from "@/lib/dal/campos"
 
 const TIPO_LABEL: Record<string, string> = {
   ganadero: "Ganadero",
@@ -42,20 +40,10 @@ const TIPO_ACCENT: Record<string, { dot: string; text: string; ring: string }> =
 export default async function CampoPublicoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
-  const { data: campo } = await supabaseAdmin
-    .from("campos")
-    .select("*, escritorios(nombre, telefono, logo_url)")
-    .eq("id", id)
-    .eq("estado", "publicado")
-    .single()
-
+  const campo = await getCampoPublico(id)
   if (!campo) notFound()
 
-  const escritorio = campo.escritorios as {
-    nombre: string
-    telefono: string | null
-    logo_url: string | null
-  }
+  const escritorio = campo.escritorios
   const fotos: string[] = campo.fotos ?? []
   const primeraFoto = fotos[0] ?? null
   const tipoAccent = campo.tipo ? (TIPO_ACCENT[campo.tipo] ?? null) : null
