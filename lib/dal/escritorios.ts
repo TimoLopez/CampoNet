@@ -35,13 +35,14 @@ export async function getOrCreateEscritorio(userId: string, email: string): Prom
   const nombre = email.split('@')[0]
   await supabase.from('escritorios').insert({ id: userId, nombre })
 
-  const { data: created } = await supabase
+  const { data: created, error: fetchError } = await supabase
     .from('escritorios')
     .select('*')
     .eq('id', userId)
     .single()
 
-  return created!
+  if (fetchError || !created) throw new Error('Failed to create escritorio')
+  return created
 }
 
 export async function updateEscritorioLogo(userId: string, logoUrl: string): Promise<void> {
