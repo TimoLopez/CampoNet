@@ -36,7 +36,7 @@ export default async function DashboardPage() {
 
   const totalCampos = campoIds.length
   const hotLeads = leads
-    .filter(l => (visitStats.get(l.id)?.count ?? 0) >= 3)
+    .filter(l => visitStats.get(l.id)?.esCaliente ?? false)
     .slice(0, 5)
     .map(l => ({
       id: l.id,
