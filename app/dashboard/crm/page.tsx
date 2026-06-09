@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Suspense } from 'react'
 import LeadRow from './LeadRow'
 import CrmFilters from './CrmFilters'
+import ExportButton from './ExportButton'
 import { Users } from 'lucide-react'
 import { getLeadsByEscritorio } from '@/lib/dal/leads'
 import { getVisitasForLeads, computeVisitStats } from '@/lib/dal/visitas'
@@ -60,9 +61,14 @@ export default async function CrmPage({ searchParams }: PageProps) {
           </div>
           <p className="text-sm text-[#8B8A7E] mt-0.5">Consultas recibidas desde tus fichas públicas</p>
         </div>
-        <Suspense>
-          <CrmFilters campos={campos} />
-        </Suspense>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <Suspense>
+            <CrmFilters campos={campos} />
+          </Suspense>
+          <Suspense>
+            <ExportButton />
+          </Suspense>
+        </div>
       </div>
 
       {/* Table or empty */}
