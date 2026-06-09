@@ -120,3 +120,44 @@ export async function associateVisitasToLead(
     .eq('campo_id', campoId)
     .is('lead_id', null)
 }
+
+export type VisitasDiaData = {
+  fecha: string // 'DD/MM'
+  visitas: number
+}
+
+export async function getVisitasByDayForCampo(
+  campoId: string,
+  days = 30
+): Promise<VisitasDiaData[]> {
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+
+  const { data, error } = await supabaseAdmin
+    .from('visitas')
+    .select('created_at')
+    .eq('campo_id', campoId)
+    .gte('created_at', since.toISOString())
+
+  if (error) throw error
+
+  // Build a map of date string -> count (UTC day)
+  const countMap = new Map<string, number>()
+  for (const row of data ?? []) {
+    const d = new Date(row.created_at)
+    // Zero-padded UTC date key: 'YYYY-MM-DD'
+    const key = d.toISOString().slice(0, 10)
+    countMap.set(key, (countMap.get(key) ?? 0) + 1)
+  }
+
+  // Generate array of last `days` days in chronological order
+  const result: VisitasDiaData[] = []
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000)
+    const key = date.toISOString().slice(0, 10)
+    const dd = String(date.getUTCDate()).padStart(2, '0')
+    const mm = String(date.getUTCMonth() + 1).padStart(2, '0')
+    result.push({ fecha: `${dd}/${mm}`, visitas: countMap.get(key) ?? 0 })
+  }
+
+  return result
+}
