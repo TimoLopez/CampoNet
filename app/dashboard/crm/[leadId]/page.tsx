@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Mail, Phone, MessageSquare, Flame, MapPin, Calendar, Clock } from 'lucide-react'
 import NotasLead from './NotasLead'
+import LeadTimeline, { type TimelineEvent } from './LeadTimeline'
 import { getLeadById } from '@/lib/dal/leads'
 import { getVisitasForLead } from '@/lib/dal/visitas'
 
@@ -47,6 +48,24 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
 
   const campoPerdido = !lead.campo_titulo && lead.campo_titulo_snapshot
   const estadoConfig = ESTADO_CONFIG[lead.estado] ?? ESTADO_CONFIG.nuevo
+
+  // Build timeline events from consulta, visitas, and timestamped notes
+  const notaEvents = (lead.notas ?? '')
+    .split(/\n\n(?=\[)/)
+    .filter(chunk => /^\[\d{2}\/\d{2}\/\d{4}\]/.test(chunk))
+    .map(chunk => {
+      const match = chunk.match(/^\[(\d{2})\/(\d{2})\/(\d{4})\]\s*([\s\S]*)$/)
+      if (!match) return null
+      const [, dd, mm, yyyy, texto] = match
+      return { type: 'nota' as const, date: `${yyyy}-${mm}-${dd}T00:00:00.000Z`, texto: texto.trim() }
+    })
+    .filter((e): e is { type: 'nota'; date: string; texto: string } => e !== null)
+
+  const timelineEvents: TimelineEvent[] = [
+    { type: 'consulta' as const, date: lead.created_at, nombre: lead.nombre },
+    ...visitas.map(v => ({ type: 'visita' as const, date: v.created_at })),
+    ...notaEvents,
+  ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
   return (
     <div className="space-y-6 max-w-2xl animate-fade-up">
@@ -153,6 +172,12 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
           </div>
         </div>
       </div>
+
+      {/* Activity timeline */}
+      <LeadTimeline
+        events={timelineEvents}
+        campoTitulo={lead.campo_titulo ?? lead.campo_titulo_snapshot ?? null}
+      />
 
       {/* Notes */}
       <div className="bg-white rounded-2xl border border-[#E2DFD6] p-6 shadow-[var(--shadow-card)]">
