@@ -35,8 +35,7 @@ export default async function CamposPage({ searchParams }: PageProps) {
 
   const campos = await getCamposPublicos(filters)
 
-  const hasActiveFilters = Object.values(filters).some(v => v != null)
-  const hasFilters = hasActiveFilters
+  const hasFilters = Object.values(filters).some(v => v != null)
 
   return (
     <>
@@ -86,7 +85,7 @@ export default async function CamposPage({ searchParams }: PageProps) {
               {campos.length === 0
                 ? 'No se encontraron resultados'
                 : `${campos.length} ${campos.length === 1 ? 'propiedad' : 'propiedades'} publicada${campos.length === 1 ? '' : 's'}`}
-              {hasActiveFilters && ' con los filtros aplicados'}
+              {hasFilters && ' con los filtros aplicados'}
             </p>
           </div>
 

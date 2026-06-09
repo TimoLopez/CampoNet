@@ -139,29 +139,16 @@ export async function getCamposPublicos(filters: CamposPublicosFilters = {}): Pr
   const { data, error } = await query
   if (error) throw error
 
-  return (data ?? []).map((row: {
-    id: string
-    titulo: string
-    departamento: string
-    hectareas: number | null
-    precio_usd: number | null
-    tipo: string | null
-    fotos: string[] | null
-    escritorios: { nombre: string } | { nombre: string }[] | null
-  }) => {
-    const escritorios = row.escritorios
-    const escritorio_nombre = Array.isArray(escritorios)
-      ? (escritorios[0]?.nombre ?? '')
-      : (escritorios?.nombre ?? '')
-    return {
-      id: row.id,
-      titulo: row.titulo,
-      departamento: row.departamento,
-      hectareas: row.hectareas,
-      precio_usd: row.precio_usd,
-      tipo: row.tipo,
-      fotos: row.fotos ?? [],
-      escritorio_nombre,
-    }
-  })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return ((data ?? []) as any[]).map((row) => ({
+    id: row.id as string,
+    titulo: row.titulo as string,
+    departamento: row.departamento as string,
+    hectareas: row.hectareas as number | null,
+    precio_usd: row.precio_usd as number | null,
+    tipo: row.tipo as string | null,
+    fotos: (row.fotos ?? []) as string[],
+    // Supabase returns a single object for many-to-one joins, never an array
+    escritorio_nombre: (row.escritorios as { nombre: string } | null)?.nombre ?? '',
+  }))
 }
