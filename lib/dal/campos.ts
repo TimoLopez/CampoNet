@@ -103,3 +103,65 @@ export async function deleteCampoWithCleanup(campoId: string, escritorioId: stri
     .eq('id', campoId)
   if (deleteError) throw deleteError
 }
+
+export type CamposPublicosFilters = {
+  departamento?: string
+  tipo?: string
+  precioMin?: number
+  precioMax?: number
+  hectareasMin?: number
+}
+
+export type CampoPublicoCard = {
+  id: string
+  titulo: string
+  departamento: string
+  hectareas: number | null
+  precio_usd: number | null
+  tipo: string | null
+  fotos: string[]
+  escritorio_nombre: string
+}
+
+export async function getCamposPublicos(filters: CamposPublicosFilters = {}): Promise<CampoPublicoCard[]> {
+  let query = supabaseAdmin
+    .from('campos')
+    .select('id, titulo, departamento, hectareas, precio_usd, tipo, fotos, escritorios(nombre)')
+    .eq('estado', 'publicado')
+    .order('created_at', { ascending: false })
+
+  if (filters.departamento) query = query.eq('departamento', filters.departamento)
+  if (filters.tipo) query = query.eq('tipo', filters.tipo)
+  if (filters.precioMin != null) query = query.gte('precio_usd', filters.precioMin)
+  if (filters.precioMax != null) query = query.lte('precio_usd', filters.precioMax)
+  if (filters.hectareasMin != null) query = query.gte('hectareas', filters.hectareasMin)
+
+  const { data, error } = await query
+  if (error) throw error
+
+  return (data ?? []).map((row: {
+    id: string
+    titulo: string
+    departamento: string
+    hectareas: number | null
+    precio_usd: number | null
+    tipo: string | null
+    fotos: string[] | null
+    escritorios: { nombre: string } | { nombre: string }[] | null
+  }) => {
+    const escritorios = row.escritorios
+    const escritorio_nombre = Array.isArray(escritorios)
+      ? (escritorios[0]?.nombre ?? '')
+      : (escritorios?.nombre ?? '')
+    return {
+      id: row.id,
+      titulo: row.titulo,
+      departamento: row.departamento,
+      hectareas: row.hectareas,
+      precio_usd: row.precio_usd,
+      tipo: row.tipo,
+      fotos: row.fotos ?? [],
+      escritorio_nombre,
+    }
+  })
+}
