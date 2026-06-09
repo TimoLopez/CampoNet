@@ -22,6 +22,7 @@ import VisitTracker from "./VisitTracker"
 import Link from "next/link"
 import MapaWrapper from "./MapaWrapper"
 import { getCampoPublico } from "@/lib/dal/campos"
+import ShareCampoButton from "@/components/ShareCampoButton"
 
 const TIPO_LABEL: Record<string, string> = {
   ganadero: "Ganadero",
@@ -105,6 +106,7 @@ export default async function CampoPublicoPage({ params }: { params: Promise<{ i
                 <MapPin className="h-3.5 w-3.5 text-[#8B6914]" />
                 <span className="font-medium">{campo.departamento}</span>
               </div>
+              <ShareCampoButton campoId={id} titulo={campo.titulo} variant="public" />
             </div>
           </div>
         </header>

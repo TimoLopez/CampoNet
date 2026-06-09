@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react'
 import CampoForm from '@/components/campos/CampoForm'
 import CampoEstadoActions from '@/components/campos/CampoEstadoActions'
 import VisitasChart from '@/components/campos/VisitasChart'
+import ShareCampoButton from '@/components/ShareCampoButton'
 import { getCampoById } from '@/lib/dal/campos'
 import { getLeadCountForCampo } from '@/lib/dal/leads'
 import { getVisitasByDayForCampo } from '@/lib/dal/visitas'
@@ -38,11 +39,16 @@ export default async function EditarCampoPage({ params }: { params: Promise<{ id
           <h1 className="text-[26px] font-bold text-[#1A1A12] mt-2 tracking-tight">Editar campo</h1>
           <p className="text-sm text-[#8B8A7E] mt-0.5 truncate max-w-[320px]">{campo.titulo}</p>
         </div>
-        <CampoEstadoActions
-          campoId={id}
-          estado={campo.estado}
-          leadsCount={leadsCount}
-        />
+        <div className="flex flex-wrap items-center gap-2">
+          {campo.estado === 'publicado' && (
+            <ShareCampoButton campoId={id} titulo={campo.titulo} variant="dashboard" />
+          )}
+          <CampoEstadoActions
+            campoId={id}
+            estado={campo.estado}
+            leadsCount={leadsCount}
+          />
+        </div>
       </div>
       <VisitasChart data={visitasData} totalVisitas={totalVisitas} />
       <CampoForm initialData={campo} />
