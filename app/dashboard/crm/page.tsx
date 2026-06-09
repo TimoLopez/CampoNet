@@ -65,9 +65,7 @@ export default async function CrmPage({ searchParams }: PageProps) {
           <Suspense>
             <CrmFilters campos={campos} />
           </Suspense>
-          <Suspense>
-            <ExportButton />
-          </Suspense>
+          <ExportButton estado={estado} campo={campo} />
         </div>
       </div>
 

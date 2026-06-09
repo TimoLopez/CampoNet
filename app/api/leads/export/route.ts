@@ -24,8 +24,9 @@ export async function GET(request: Request) {
 
     const leads = await getLeadsByEscritorio(user.id, { estado, campo })
 
-    const headers = ['Nombre', 'Email', 'Teléfono', 'Estado', 'Campo', 'Mensaje', 'Notas', 'Fecha']
+    const headers = ['ID', 'Nombre', 'Email', 'Teléfono', 'Estado', 'Campo', 'Mensaje', 'Notas', 'Fecha consulta']
     const rows = leads.map(l => [
+      escapeCsv(l.id),
       escapeCsv(l.nombre),
       escapeCsv(l.email),
       escapeCsv(l.telefono),
