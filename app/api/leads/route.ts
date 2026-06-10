@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { Resend } from 'resend'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { upsertLead } from '@/lib/dal/leads'
+import { createConsulta } from '@/lib/dal/consultas'
 import { associateVisitasToLead } from '@/lib/dal/visitas'
 import { CreateLeadSchema } from '@/lib/schemas/lead'
 
@@ -30,7 +31,13 @@ export async function POST(request: Request) {
       nombre,
       email: email ?? null,
       telefono: telefono ?? null,
-      mensaje: mensaje ?? null,
+    })
+
+    await createConsulta({
+      leadId,
+      campoId,
+      escritorioId: campo.escritorio_id,
+      mensaje: mensaje ?? '(sin mensaje)',
     })
 
     const cookieStore = await cookies()
