@@ -19,7 +19,6 @@ export type CreateLeadInput = {
   nombre: string
   email: string | null
   telefono: string | null
-  mensaje: string | null
 }
 
 export async function getLeadsByEscritorio(
@@ -98,19 +97,15 @@ export async function upsertLead(input: CreateLeadInput): Promise<string> {
   if (input.email) {
     const { data: existing } = await supabaseAdmin
       .from('leads')
-      .select('id, notas')
+      .select('id')
       .eq('email', input.email)
       .eq('campo_id', input.campoId)
       .maybeSingle()
 
     if (existing) {
-      const fecha = new Date().toLocaleDateString('es-UY')
-      const newNotas = existing.notas
-        ? `${existing.notas}\n\n[${fecha}] ${input.mensaje || '(sin mensaje)'}`
-        : input.mensaje || ''
       await supabaseAdmin
         .from('leads')
-        .update({ notas: newNotas, estado: 'nuevo' })
+        .update({ estado: 'nuevo' })
         .eq('id', existing.id)
       return existing.id
     }
@@ -124,7 +119,6 @@ export async function upsertLead(input: CreateLeadInput): Promise<string> {
       nombre: input.nombre,
       email: input.email,
       telefono: input.telefono,
-      mensaje: input.mensaje,
     })
     .select('id')
     .single()

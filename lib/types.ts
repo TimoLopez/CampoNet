@@ -58,3 +58,12 @@ export type LeadConVisitas = Lead & {
   ultima_visita: string | null
   es_caliente: boolean
 }
+
+export type Consulta = {
+  id: string
+  lead_id: string
+  campo_id: string | null
+  escritorio_id: string
+  mensaje: string
+  created_at: string
+}
