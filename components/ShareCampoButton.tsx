@@ -6,7 +6,7 @@ import { Share2, Copy, Check } from 'lucide-react'
 interface Props {
   campoId: string
   titulo: string
-  variant?: 'public' | 'dashboard'
+  variant?: 'public' | 'dashboard' | 'hero'
 }
 
 export default function ShareCampoButton({ campoId, titulo, variant = 'public' }: Props) {
@@ -69,7 +69,9 @@ export default function ShareCampoButton({ campoId, titulo, variant = 'public' }
   const buttonClass =
     variant === 'dashboard'
       ? 'inline-flex items-center gap-1.5 h-9 px-3 rounded-xl text-[12.5px] font-medium border border-[#E2DFD6] bg-white text-[#2A2A1E] hover:bg-[#F7F5F0] transition-all duration-150 cursor-pointer'
-      : 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] bg-white/70 border border-[#E4E0D6] text-[#5C5B4F] hover:bg-white transition-all duration-150 cursor-pointer'
+      : variant === 'hero'
+      ? 'inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-semibold bg-white/20 border border-white/30 text-white hover:bg-white/30 backdrop-blur-sm transition-all duration-150 cursor-pointer'
+      : 'inline-flex items-center gap-1.5 h-9 px-4 rounded-full text-[12.5px] font-medium bg-white border border-[#E4E0D6] text-[#1C3311] hover:bg-[#F7F5F0] shadow-sm transition-all duration-150 cursor-pointer'
 
   return (
     <div ref={containerRef} className="relative">

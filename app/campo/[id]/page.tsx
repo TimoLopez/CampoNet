@@ -142,15 +142,15 @@ export default async function CampoPublicoPage({ params }: { params: Promise<{ i
                   {TIPO_LABEL[campo.tipo] ?? campo.tipo}
                 </span>
               )}
-              {fotos.length > 0 && (
-                <span
-                  className="cn-reveal inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-medium cn-glass-dark border border-white/15 text-white/85"
-                  style={{ animationDelay: "0.15s" }}
-                >
-                  <Camera className="h-3.5 w-3.5" />
-                  {fotos.length} {fotos.length === 1 ? "foto" : "fotos"}
-                </span>
-              )}
+              <div className="cn-reveal flex items-center gap-2.5" style={{ animationDelay: "0.15s" }}>
+                {fotos.length > 0 && (
+                  <span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-medium cn-glass-dark border border-white/15 text-white/85">
+                    <Camera className="h-3.5 w-3.5" />
+                    {fotos.length} {fotos.length === 1 ? "foto" : "fotos"}
+                  </span>
+                )}
+                <ShareCampoButton campoId={id} titulo={campo.titulo} variant="hero" />
+              </div>
             </div>
           </div>
 
@@ -224,6 +224,12 @@ export default async function CampoPublicoPage({ params }: { params: Promise<{ i
         <div className="max-w-6xl mx-auto px-5 py-10 md:py-14 grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
           {/* Left column */}
           <div className="lg:col-span-2 space-y-7">
+            {/* Share prompt — visible on all screen sizes, especially mobile */}
+            <div className="cn-reveal flex items-center justify-between" style={{ animationDelay: "0.02s" }}>
+              <p className="text-[13px] text-[#8B8A7E] font-medium">¿Conocés a alguien interesado?</p>
+              <ShareCampoButton campoId={id} titulo={campo.titulo} variant="public" />
+            </div>
+
             {/* Premium stat dashboard */}
             <div
               className="cn-reveal grid grid-cols-2 lg:grid-cols-4 gap-3.5"
