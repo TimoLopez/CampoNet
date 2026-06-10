@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { MapPin, Copy, Check, ExternalLink, Pencil } from 'lucide-react'
+import { MapPin, Copy, Check, ExternalLink, Pencil, BarChart2 } from 'lucide-react'
 import type { Campo } from '@/lib/types'
 
 const estadoConfig = {
@@ -110,6 +110,13 @@ export default function CampoCard({ campo }: { campo: Campo }) {
           >
             <Pencil className="h-3 w-3" />
             Editar
+          </Link>
+          <Link
+            href={`/dashboard/campos/${campo.id}/estadisticas`}
+            className="w-9 h-9 flex items-center justify-center rounded-xl border border-[#E2DFD6] text-[#8B8A7E] hover:border-[#C49A3C]/40 hover:text-[#8B6914] hover:bg-[#F9F8F5] active:scale-[0.95] transition-all duration-150 cursor-pointer"
+            title="Ver estadísticas"
+          >
+            <BarChart2 className="h-3.5 w-3.5" />
           </Link>
           <button
             type="button"

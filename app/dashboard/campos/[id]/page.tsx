@@ -4,26 +4,21 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import CampoForm from '@/components/campos/CampoForm'
 import CampoEstadoActions from '@/components/campos/CampoEstadoActions'
-import VisitasChart from '@/components/campos/VisitasChart'
 import ShareCampoButton from '@/components/ShareCampoButton'
 import { getCampoById } from '@/lib/dal/campos'
 import { getLeadCountForCampo } from '@/lib/dal/leads'
-import { getVisitasByDayForCampo } from '@/lib/dal/visitas'
 
 export default async function EditarCampoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const [campo, leadsCount, visitasData] = await Promise.all([
+  const [campo, leadsCount] = await Promise.all([
     getCampoById(id, user!.id),
     getLeadCountForCampo(id),
-    getVisitasByDayForCampo(id),
   ])
 
   if (!campo) notFound()
-
-  const totalVisitas = visitasData.reduce((sum, d) => sum + d.visitas, 0)
 
   return (
     <div className="space-y-7 animate-fade-up">
@@ -50,7 +45,6 @@ export default async function EditarCampoPage({ params }: { params: Promise<{ id
           />
         </div>
       </div>
-      <VisitasChart data={visitasData} totalVisitas={totalVisitas} />
       <CampoForm initialData={campo} />
     </div>
   )
