@@ -4,7 +4,7 @@ import { getLeadsByEscritorio } from '@/lib/dal/leads'
 function escapeCsv(value: string | null | undefined): string {
   if (value == null) return ''
   const str = String(value)
-  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+  if (str.includes(';') || str.includes('"') || str.includes('\n')) {
     return `"${str.replace(/"/g, '""')}"`
   }
   return str
@@ -24,9 +24,8 @@ export async function GET(request: Request) {
 
     const leads = await getLeadsByEscritorio(user.id, { estado, campo })
 
-    const headers = ['ID', 'Nombre', 'Email', 'Teléfono', 'Estado', 'Campo', 'Mensaje', 'Notas', 'Fecha consulta']
+    const headers = ['Nombre', 'Email', 'Teléfono', 'Estado', 'Campo', 'Mensaje', 'Notas', 'Fecha consulta']
     const rows = leads.map(l => [
-      escapeCsv(l.id),
       escapeCsv(l.nombre),
       escapeCsv(l.email),
       escapeCsv(l.telefono),
@@ -37,7 +36,7 @@ export async function GET(request: Request) {
       escapeCsv(l.created_at ? new Date(l.created_at).toLocaleDateString('es-UY') : null),
     ])
 
-    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+    const csv = '﻿' + [headers, ...rows].map(row => row.join(';')).join('\r\n')
 
     return new Response(csv, {
       status: 200,
