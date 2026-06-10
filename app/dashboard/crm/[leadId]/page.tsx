@@ -6,6 +6,8 @@ import NotasLead from './NotasLead'
 import LeadTimeline, { type TimelineEvent } from './LeadTimeline'
 import { getLeadById } from '@/lib/dal/leads'
 import { getVisitasForLead } from '@/lib/dal/visitas'
+import { getConsultasForLead } from '@/lib/dal/consultas'
+import type { Consulta } from '@/lib/types'
 
 const ESTADO_CONFIG: Record<string, { label: string; dot: string; className: string }> = {
   nuevo:       { label: 'Nuevo',       dot: 'bg-blue-500',   className: 'bg-blue-50 text-blue-700 border-blue-200/80' },
@@ -42,6 +44,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
   if (!lead) notFound()
 
   const visitas = await getVisitasForLead(leadId)
+  const consultas = await getConsultasForLead(leadId)
   const cutoffDays = 14
   const cutoff = new Date(Date.now() - cutoffDays * 24 * 60 * 60 * 1000)
   const esCaliente = visitas.filter(v => new Date(v.created_at) > cutoff).length >= 3
@@ -49,20 +52,25 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
   const campoPerdido = !lead.campo_titulo && lead.campo_titulo_snapshot
   const estadoConfig = ESTADO_CONFIG[lead.estado] ?? ESTADO_CONFIG.nuevo
 
-  // Build timeline events from consulta, visitas, and timestamped notes
-  const notaEvents = (lead.notas ?? '')
+  // Parse manually added notes (written by the escritorio, format: [DD/MM/YYYY] texto)
+  const notaEvents: TimelineEvent[] = (lead.notas ?? '')
     .split(/\n\n(?=\[)/)
-    .filter(chunk => /^\[\d{2}\/\d{2}\/\d{4}\]/.test(chunk))
-    .map(chunk => {
+    .filter((chunk: string) => /^\[\d{2}\/\d{2}\/\d{4}\]/.test(chunk))
+    .map((chunk: string): TimelineEvent | null => {
       const match = chunk.match(/^\[(\d{2})\/(\d{2})\/(\d{4})\]\s*([\s\S]*)$/)
       if (!match) return null
       const [, dd, mm, yyyy, texto] = match
       return { type: 'nota' as const, date: `${yyyy}-${mm}-${dd}T00:00:00.000Z`, texto: texto.trim() }
     })
-    .filter((e): e is { type: 'nota'; date: string; texto: string } => e !== null)
+    .filter((e): e is TimelineEvent => e !== null)
 
   const timelineEvents: TimelineEvent[] = [
-    { type: 'consulta' as const, date: lead.created_at, nombre: lead.nombre },
+    ...consultas.map((c: Consulta) => ({
+      type: 'consulta' as const,
+      date: c.created_at,
+      nombre: lead.nombre,
+      mensaje: c.mensaje,
+    })),
     ...visitas.map(v => ({ type: 'visita' as const, date: v.created_at })),
     ...notaEvents,
   ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())

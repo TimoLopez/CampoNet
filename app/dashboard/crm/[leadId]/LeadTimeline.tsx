@@ -3,7 +3,7 @@
 import { Clock, MessageSquare, Eye, FileText } from 'lucide-react'
 
 export type TimelineEvent =
-  | { type: 'consulta'; date: string; nombre: string }
+  | { type: 'consulta'; date: string; nombre: string; mensaje: string }
   | { type: 'visita';   date: string }
   | { type: 'nota';     date: string; texto: string }
 
@@ -63,9 +63,16 @@ function EventText({
 }) {
   if (event.type === 'consulta') {
     return (
-      <p className="text-[13.5px] text-[#1A1A12]">
-        Envió una consulta{campoTitulo ? ` sobre ${campoTitulo}` : ''}
-      </p>
+      <div>
+        <p className="text-[13.5px] text-[#1A1A12]">
+          Envió una consulta{campoTitulo ? ` sobre ${campoTitulo}` : ''}
+        </p>
+        {event.mensaje && event.mensaje !== '(sin mensaje)' && (
+          <p className="text-[12.5px] text-[#5C5B4F] mt-1 leading-relaxed line-clamp-3">
+            "{event.mensaje}"
+          </p>
+        )}
+      </div>
     )
   }
   if (event.type === 'visita') {
