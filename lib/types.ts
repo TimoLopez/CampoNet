@@ -21,6 +21,8 @@ export type Campo = {
   acceso_ruta: boolean
   coneat: number | null
   caracteristicas: string[]
+  comision_pct: number | null
+  exclusividad: boolean
   lat: number | null
   lng: number | null
   fotos: string[]
