@@ -5,6 +5,7 @@ import { ArrowLeft, Mail, Phone, MessageSquare, Flame, MapPin, Calendar, Clock }
 import NotasLead from './NotasLead'
 import LeadTimeline, { type TimelineEvent } from './LeadTimeline'
 import ScoreCard from './ScoreCard'
+import ComisionCard from './ComisionCard'
 import { getLeadById } from '@/lib/dal/leads'
 import { getVisitasForLead } from '@/lib/dal/visitas'
 import { getConsultasForLead } from '@/lib/dal/consultas'
@@ -129,6 +130,15 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
           </div>
         </div>
       </div>
+
+      {/* Comisión (solo si la venta está cerrada) */}
+      {lead.estado === 'cerrado' && (
+        <ComisionCard
+          precioUsd={lead.campo_precio_usd}
+          comisionPct={lead.campo_comision_pct}
+          campoId={lead.campo_id}
+        />
+      )}
 
       {/* Score IA */}
       <ScoreCard
