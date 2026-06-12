@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 import { getConsultasForLead } from '@/lib/dal/consultas'
 import { getVisitasForLead } from '@/lib/dal/visitas'
 import { updateLeadScore } from '@/lib/dal/leads'
@@ -9,6 +10,10 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 export async function POST(request: Request) {
   try {
+    const supabase = await createServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+
     const { leadId } = await request.json()
     if (!leadId || typeof leadId !== 'string') {
       return NextResponse.json({ error: 'leadId requerido' }, { status: 400 })
@@ -84,6 +89,11 @@ Responde ÚNICAMENTE con un JSON válido, sin texto adicional:
 
     if (typeof parsed.score !== 'number' || !parsed.categoria || !parsed.justificacion) {
       throw new Error('Respuesta de IA incompleta')
+    }
+
+    const VALID_CATEGORIAS = ['frio', 'tibio', 'caliente'] as const
+    if (!VALID_CATEGORIAS.includes(parsed.categoria as 'frio' | 'tibio' | 'caliente')) {
+      throw new Error(`Categoría de IA inválida: ${parsed.categoria}`)
     }
 
     const score = Math.max(0, Math.min(100, Math.round(parsed.score)))

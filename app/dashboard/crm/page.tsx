@@ -36,8 +36,8 @@ export default async function CrmPage({ searchParams }: PageProps) {
     total_visitas: visitStats.get(l.id)?.count ?? 0,
     ultima_visita: visitStats.get(l.id)?.ultima ?? null,
     es_caliente: visitStats.get(l.id)?.esCaliente ?? false,
-    score: (l as any).score ?? null,
-    score_categoria: (l as any).score_categoria ?? null,
+    score: l.score ?? null,
+    score_categoria: l.score_categoria ?? null,
   }))
 
   const hotCount = rows.filter(r => r.es_caliente).length
