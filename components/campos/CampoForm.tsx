@@ -6,7 +6,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import dynamic from 'next/dynamic'
-import { Sparkles, MapPin, FileText, ImageIcon, Map, Loader2, Droplets, Route, Layers } from 'lucide-react'
+import { Sparkles, MapPin, FileText, ImageIcon, Map, Loader2, Droplets, Route, Layers, Briefcase, Lock } from 'lucide-react'
 import CampoCaracteristicas from './CampoCaracteristicas'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -40,6 +40,11 @@ const schema = z.object({
   acceso_ruta: z.boolean(),
   coneat: z.preprocess(v => (!v && v !== 0 ? undefined : Number(v)), z.number().min(0).optional()),
   caracteristicas: z.array(z.string()),
+  comision_pct: z.preprocess(
+    v => (!v && v !== 0 ? undefined : Number(v)),
+    z.number().min(0).max(100).optional()
+  ),
+  exclusividad: z.boolean(),
   video_url: z.string().url('URL de video inválida').optional().or(z.literal('')).transform(v => v || undefined),
   estado: z.enum(['publicado', 'borrador']),
   lat: z.number().optional(),
@@ -122,6 +127,8 @@ export default function CampoForm({ initialData }: Props) {
       acceso_ruta: initialData?.acceso_ruta ?? false,
       coneat: initialData?.coneat ?? ('' as any),
       caracteristicas: initialData?.caracteristicas ?? [],
+      comision_pct: initialData?.comision_pct ?? ('' as any),
+      exclusividad: initialData?.exclusividad ?? false,
       video_url: initialData?.video_url ?? '',
       estado: (initialData?.estado === 'archivado' || initialData?.estado === 'vendido' ? 'publicado' : initialData?.estado) ?? 'borrador',
       lat: initialData?.lat ?? undefined,
@@ -189,6 +196,8 @@ export default function CampoForm({ initialData }: Props) {
         acceso_ruta: data.acceso_ruta,
         coneat: data.coneat ?? null,
         caracteristicas: data.caracteristicas,
+        comision_pct: data.comision_pct ?? null,
+        exclusividad: data.exclusividad,
         video_url: data.video_url || null,
         estado: publicar ? 'publicado' : data.estado,
         lat: data.lat ?? null,
@@ -450,6 +459,53 @@ export default function CampoForm({ initialData }: Props) {
             />
           )}
         />
+      </SectionCard>
+
+      {/* ── Datos del negocio ── */}
+      <SectionCard icon={Briefcase} title="Datos del negocio">
+        <p className="text-[11.5px] text-[#8B8A7E] flex items-center gap-1.5 -mt-1">
+          <Lock className="h-3 w-3 shrink-0" />
+          Información interna — no visible en la ficha pública.
+        </p>
+        <div className="grid grid-cols-2 gap-4">
+          <FieldGroup>
+            <FieldLabel htmlFor="comision_pct">Comisión (%)</FieldLabel>
+            <Input
+              id="comision_pct"
+              type="number"
+              step="0.1"
+              min="0"
+              max="100"
+              {...register('comision_pct')}
+              placeholder="Ej. 3"
+              className={inputCls}
+            />
+            <p className="text-[11.5px] text-[#8B8A7E]">% sobre el precio de venta</p>
+          </FieldGroup>
+          <FieldGroup>
+            <FieldLabel>Exclusividad</FieldLabel>
+            <div className="flex items-center gap-3 mt-2">
+              <Controller
+                name="exclusividad"
+                control={control}
+                render={({ field }) => (
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    id="exclusividad"
+                    className="data-[state=checked]:bg-[#1C3311]"
+                  />
+                )}
+              />
+              <label
+                htmlFor="exclusividad"
+                className="text-[13px] font-medium text-[#2A2A1E] cursor-pointer select-none"
+              >
+                Venta en exclusiva
+              </label>
+            </div>
+          </FieldGroup>
+        </div>
       </SectionCard>
 
       {/* ── Acciones ── */}
