@@ -75,3 +75,14 @@ export type Consulta = {
   mensaje: string
   created_at: string
 }
+
+export type VisitaCoordinada = {
+  id: string
+  lead_id: string
+  campo_id: string
+  escritorio_id: string
+  fecha_hora: string
+  estado: 'programada' | 'realizada' | 'cancelada'
+  notas: string | null
+  created_at: string
+}
