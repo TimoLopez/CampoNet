@@ -481,6 +481,7 @@ export default function CampoForm({ initialData }: Props) {
               className={inputCls}
             />
             <p className="text-[11.5px] text-[#8B8A7E]">% sobre el precio de venta</p>
+            <FieldError message={errors.comision_pct?.message} />
           </FieldGroup>
           <FieldGroup>
             <FieldLabel>Exclusividad</FieldLabel>
