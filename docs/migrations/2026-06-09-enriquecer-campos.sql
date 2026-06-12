@@ -1,22 +1,13 @@
 -- Migration: Enriquecer datos del campo
--- Adds CONEAT index, infrastructure checkboxes, accessibility fields
--- and 'turistica' as a new tipo option
+-- Adds CONEAT index, caracteristicas text[] for flexible infrastructure/accessibility data,
+-- and 'turistica' as a new tipo option.
 
--- CONEAT soil productivity index
+-- CONEAT soil productivity index (numeric, optional)
 ALTER TABLE campos ADD COLUMN IF NOT EXISTS coneat numeric(6,2) DEFAULT NULL;
 
--- Infrastructure boolean flags
-ALTER TABLE campos ADD COLUMN IF NOT EXISTS infra_vivienda boolean NOT NULL DEFAULT false;
-ALTER TABLE campos ADD COLUMN IF NOT EXISTS infra_galpon boolean NOT NULL DEFAULT false;
-ALTER TABLE campos ADD COLUMN IF NOT EXISTS infra_corrales boolean NOT NULL DEFAULT false;
-ALTER TABLE campos ADD COLUMN IF NOT EXISTS infra_energia_electrica boolean NOT NULL DEFAULT false;
-ALTER TABLE campos ADD COLUMN IF NOT EXISTS infra_riego boolean NOT NULL DEFAULT false;
-ALTER TABLE campos ADD COLUMN IF NOT EXISTS infra_caminos_internos boolean NOT NULL DEFAULT false;
-
--- Additional accessibility points (acceso_ruta already exists)
-ALTER TABLE campos ADD COLUMN IF NOT EXISTS acceso_puerto boolean NOT NULL DEFAULT false;
-ALTER TABLE campos ADD COLUMN IF NOT EXISTS acceso_frigorifico boolean NOT NULL DEFAULT false;
-ALTER TABLE campos ADD COLUMN IF NOT EXISTS acceso_planta boolean NOT NULL DEFAULT false;
+-- Flexible characteristics array — stores any combination of features:
+-- predefined (Vivienda, Galpón, Corrales, ...) or free-text custom items
+ALTER TABLE campos ADD COLUMN IF NOT EXISTS caracteristicas text[] NOT NULL DEFAULT '{}';
 
 -- Add 'turistica' to tipo options
 -- If tipo uses a CHECK constraint (most common in Supabase):
@@ -28,3 +19,6 @@ ALTER TABLE campos ADD CONSTRAINT campos_tipo_check
 -- DO $$ BEGIN
 --   ALTER TYPE tipo_campo ADD VALUE IF NOT EXISTS 'turistica';
 -- EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- Index for array containment queries (e.g. filter by 'Energía eléctrica')
+CREATE INDEX IF NOT EXISTS campos_caracteristicas_gin ON campos USING GIN (caracteristicas);

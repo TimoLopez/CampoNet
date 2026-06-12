@@ -20,15 +20,7 @@ export type Campo = {
   agua: boolean
   acceso_ruta: boolean
   coneat: number | null
-  infra_vivienda: boolean
-  infra_galpon: boolean
-  infra_corrales: boolean
-  infra_energia_electrica: boolean
-  infra_riego: boolean
-  infra_caminos_internos: boolean
-  acceso_puerto: boolean
-  acceso_frigorifico: boolean
-  acceso_planta: boolean
+  caracteristicas: string[]
   lat: number | null
   lng: number | null
   fotos: string[]

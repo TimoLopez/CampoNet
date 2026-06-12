@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import dynamic from 'next/dynamic'
 import { Sparkles, MapPin, FileText, ImageIcon, Map, Loader2, Droplets, Route, Layers } from 'lucide-react'
+import CampoCaracteristicas from './CampoCaracteristicas'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -38,15 +39,7 @@ const schema = z.object({
   agua: z.boolean(),
   acceso_ruta: z.boolean(),
   coneat: z.preprocess(v => (!v && v !== 0 ? undefined : Number(v)), z.number().min(0).optional()),
-  infra_vivienda: z.boolean(),
-  infra_galpon: z.boolean(),
-  infra_corrales: z.boolean(),
-  infra_energia_electrica: z.boolean(),
-  infra_riego: z.boolean(),
-  infra_caminos_internos: z.boolean(),
-  acceso_puerto: z.boolean(),
-  acceso_frigorifico: z.boolean(),
-  acceso_planta: z.boolean(),
+  caracteristicas: z.array(z.string()),
   video_url: z.string().url('URL de video inválida').optional().or(z.literal('')).transform(v => v || undefined),
   estado: z.enum(['publicado', 'borrador']),
   lat: z.number().optional(),
@@ -108,27 +101,6 @@ function FieldError({ message }: { message?: string }) {
 
 const inputCls = "h-11 rounded-xl border-[#E2DFD6] bg-[#F9F8F5] text-[#1A1A12] text-sm placeholder:text-[#C2BFB5] focus-visible:border-[#C49A3C] focus-visible:ring-2 focus-visible:ring-[#C49A3C]/20 transition-all duration-150"
 
-function ToggleField({ name, label, control }: { name: string; label: string; control: any }) {
-  return (
-    <div className="flex items-center gap-3">
-      <Controller
-        name={name as any}
-        control={control}
-        render={({ field }) => (
-          <Switch
-            checked={!!field.value}
-            onCheckedChange={field.onChange}
-            id={`tf-${name}`}
-            className="data-[state=checked]:bg-[#1C3311]"
-          />
-        )}
-      />
-      <label htmlFor={`tf-${name}`} className="text-[13px] font-medium text-[#2A2A1E] cursor-pointer select-none">
-        {label}
-      </label>
-    </div>
-  )
-}
 
 export default function CampoForm({ initialData }: Props) {
   const router = useRouter()
@@ -149,15 +121,7 @@ export default function CampoForm({ initialData }: Props) {
       agua: initialData?.agua ?? false,
       acceso_ruta: initialData?.acceso_ruta ?? false,
       coneat: initialData?.coneat ?? ('' as any),
-      infra_vivienda: initialData?.infra_vivienda ?? false,
-      infra_galpon: initialData?.infra_galpon ?? false,
-      infra_corrales: initialData?.infra_corrales ?? false,
-      infra_energia_electrica: initialData?.infra_energia_electrica ?? false,
-      infra_riego: initialData?.infra_riego ?? false,
-      infra_caminos_internos: initialData?.infra_caminos_internos ?? false,
-      acceso_puerto: initialData?.acceso_puerto ?? false,
-      acceso_frigorifico: initialData?.acceso_frigorifico ?? false,
-      acceso_planta: initialData?.acceso_planta ?? false,
+      caracteristicas: initialData?.caracteristicas ?? [],
       video_url: initialData?.video_url ?? '',
       estado: (initialData?.estado === 'archivado' || initialData?.estado === 'vendido' ? 'publicado' : initialData?.estado) ?? 'borrador',
       lat: initialData?.lat ?? undefined,
@@ -219,15 +183,7 @@ export default function CampoForm({ initialData }: Props) {
         agua: data.agua,
         acceso_ruta: data.acceso_ruta,
         coneat: data.coneat ?? null,
-        infra_vivienda: data.infra_vivienda,
-        infra_galpon: data.infra_galpon,
-        infra_corrales: data.infra_corrales,
-        infra_energia_electrica: data.infra_energia_electrica,
-        infra_riego: data.infra_riego,
-        infra_caminos_internos: data.infra_caminos_internos,
-        acceso_puerto: data.acceso_puerto,
-        acceso_frigorifico: data.acceso_frigorifico,
-        acceso_planta: data.acceso_planta,
+        caracteristicas: data.caracteristicas,
         video_url: data.video_url || null,
         estado: publicar ? 'publicado' : data.estado,
         lat: data.lat ?? null,
@@ -405,27 +361,15 @@ export default function CampoForm({ initialData }: Props) {
         </div>
       </SectionCard>
 
-      {/* ── Infraestructura y accesos ── */}
-      <SectionCard icon={Layers} title="Infraestructura y accesos">
-        <div className="space-y-2">
-          <p className="text-[12px] text-[#8B8A7E] mb-3">Instalaciones en el campo</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3.5 gap-x-8">
-            <ToggleField name="infra_vivienda" label="Vivienda" control={control} />
-            <ToggleField name="infra_galpon" label="Galpón" control={control} />
-            <ToggleField name="infra_corrales" label="Corrales" control={control} />
-            <ToggleField name="infra_energia_electrica" label="Energía eléctrica" control={control} />
-            <ToggleField name="infra_riego" label="Sistema de riego" control={control} />
-            <ToggleField name="infra_caminos_internos" label="Caminos internos" control={control} />
-          </div>
-        </div>
-        <div className="pt-4 border-t border-[#F7F5F0] space-y-2">
-          <p className="text-[12px] text-[#8B8A7E] mb-3">Proximidad a infraestructura externa</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3.5 gap-x-8">
-            <ToggleField name="acceso_puerto" label="Acceso a puerto" control={control} />
-            <ToggleField name="acceso_frigorifico" label="Frigorífico cercano" control={control} />
-            <ToggleField name="acceso_planta" label="Planta industrial" control={control} />
-          </div>
-        </div>
+      {/* ── Características ── */}
+      <SectionCard icon={Layers} title="Características">
+        <Controller
+          name="caracteristicas"
+          control={control}
+          render={({ field }) => (
+            <CampoCaracteristicas value={field.value} onChange={field.onChange} />
+          )}
+        />
       </SectionCard>
 
       {/* ── Descripción ── */}

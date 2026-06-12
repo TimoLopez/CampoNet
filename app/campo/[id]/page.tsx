@@ -17,12 +17,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Layers,
-  Home,
-  Warehouse,
-  Zap,
-  Anchor,
-  Thermometer,
-  Factory,
 } from "lucide-react"
 import ContactForm from "./ContactForm"
 import VisitTracker from "./VisitTracker"
@@ -47,14 +41,6 @@ const TIPO_ACCENT: Record<string, { dot: string; text: string; ring: string }> =
   turistica: { dot: "bg-pink-400", text: "text-pink-100", ring: "ring-pink-300/30" },
 }
 
-function FeatureBadge({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
-  return (
-    <span className="inline-flex items-center gap-1.5 text-[12.5px] text-[#2A2A1E] bg-white border border-[#E4E0D6] rounded-xl px-3.5 py-2">
-      <Icon className="h-3.5 w-3.5 text-[#8B6914] shrink-0" />
-      {label}
-    </span>
-  )
-}
 
 export default async function CampoPublicoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -326,11 +312,8 @@ export default async function CampoPublicoPage({ params }: { params: Promise<{ i
               </section>
             )}
 
-            {/* Technical features — shown only when there's data */}
-            {(campo.coneat != null ||
-              campo.infra_vivienda || campo.infra_galpon || campo.infra_corrales ||
-              campo.infra_energia_electrica || campo.infra_riego || campo.infra_caminos_internos ||
-              campo.acceso_puerto || campo.acceso_frigorifico || campo.acceso_planta) && (
+            {/* Características — shown only when there's data */}
+            {(campo.coneat != null || campo.caracteristicas.length > 0) && (
               <section className="cn-reveal" style={{ animationDelay: "0.11s" }}>
                 <div className="flex items-center gap-2.5 mb-4 px-1">
                   <Layers className="h-4 w-4 text-[#C49A3C]" />
@@ -345,15 +328,14 @@ export default async function CampoPublicoPage({ params }: { params: Promise<{ i
                       <span className="font-bold text-[#1C3311] tabular-nums">{campo.coneat}</span>
                     </span>
                   )}
-                  {campo.infra_vivienda && <FeatureBadge icon={Home} label="Vivienda" />}
-                  {campo.infra_galpon && <FeatureBadge icon={Warehouse} label="Galpón" />}
-                  {campo.infra_corrales && <FeatureBadge icon={Layers} label="Corrales" />}
-                  {campo.infra_energia_electrica && <FeatureBadge icon={Zap} label="Energía eléctrica" />}
-                  {campo.infra_riego && <FeatureBadge icon={Droplets} label="Sistema de riego" />}
-                  {campo.infra_caminos_internos && <FeatureBadge icon={Route} label="Caminos internos" />}
-                  {campo.acceso_puerto && <FeatureBadge icon={Anchor} label="Acceso a puerto" />}
-                  {campo.acceso_frigorifico && <FeatureBadge icon={Thermometer} label="Frigorífico cercano" />}
-                  {campo.acceso_planta && <FeatureBadge icon={Factory} label="Planta industrial" />}
+                  {campo.caracteristicas.map(item => (
+                    <span
+                      key={item}
+                      className="inline-flex items-center text-[12.5px] text-[#2A2A1E] bg-white border border-[#E4E0D6] rounded-xl px-3.5 py-2"
+                    >
+                      {item}
+                    </span>
+                  ))}
                 </div>
               </section>
             )}
