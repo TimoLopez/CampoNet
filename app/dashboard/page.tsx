@@ -5,6 +5,7 @@ import { getCampoIdsForEscritorio } from '@/lib/dal/campos'
 import { getTotalLeadCount, getLeadsBasicoForEscritorio } from '@/lib/dal/leads'
 import { getVisitCountForCampos, getVisitasForLeads, computeVisitStats } from '@/lib/dal/visitas'
 import { getEscritorioNombre } from '@/lib/dal/escritorios'
+import ProximasVisitas from './ProximasVisitas'
 
 function greeting() {
   const h = new Date().getHours()
@@ -180,6 +181,9 @@ export default async function DashboardPage() {
           </ul>
         </div>
       )}
+
+      {/* ── Próximas visitas ── */}
+      <ProximasVisitas escritorioId={user!.id} />
 
       {/* ── Empty state ── */}
       {totalCampos === 0 && (
