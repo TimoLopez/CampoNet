@@ -46,6 +46,14 @@ export async function POST(request: Request) {
       await associateVisitasToLead(sessionId, campoId, leadId)
     }
 
+    // Fire-and-forget: calcular score IA sin bloquear la respuesta
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+    fetch(`${appUrl}/api/ia/score-lead`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ leadId }),
+    }).catch(() => {})
+
     if (process.env.RESEND_API_KEY) {
       const { data: { user } } = await supabaseAdmin.auth.admin.getUserById(campo.escritorio_id)
       if (user?.email) {
