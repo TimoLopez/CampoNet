@@ -24,6 +24,7 @@ import Link from "next/link"
 import MapaWrapper from "./MapaWrapper"
 import { getCampoPublico } from "@/lib/dal/campos"
 import ShareCampoButton from "@/components/ShareCampoButton"
+import CamposSimilares from './CamposSimilares'
 
 const TIPO_LABEL: Record<string, string> = {
   ganadero: "Ganadero",
@@ -587,6 +588,16 @@ export default async function CampoPublicoPage({ params }: { params: Promise<{ i
               </div>
             </div>
           </aside>
+        </div>
+
+        {/* Campos similares */}
+        <div className="max-w-6xl mx-auto px-5">
+          <CamposSimilares
+            campoId={id}
+            departamento={campo.departamento}
+            tipo={campo.tipo}
+            precioUsd={campo.precio_usd}
+          />
         </div>
 
         {/* Footer */}
