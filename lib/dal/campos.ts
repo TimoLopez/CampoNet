@@ -152,3 +152,53 @@ export async function getCamposPublicos(filters: CamposPublicosFilters = {}): Pr
     escritorio_nombre: (row.escritorios as { nombre: string } | null)?.nombre ?? '',
   }))
 }
+
+export async function getCamposSimilares(params: {
+  campoId: string
+  departamento: string
+  tipo: string | null
+  precioUsd: number | null
+  limit?: number
+}): Promise<CampoPublicoCard[]> {
+  const { campoId, departamento, tipo, precioUsd, limit = 3 } = params
+
+  const { data, error } = await supabaseAdmin
+    .from('campos')
+    .select('id, titulo, departamento, hectareas, precio_usd, tipo, fotos, escritorios(nombre)')
+    .eq('estado', 'publicado')
+    .eq('departamento', departamento)
+    .neq('id', campoId)
+    .limit(20)
+
+  if (error) throw error
+  if (!data?.length) return []
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rows: CampoPublicoCard[] = (data as any[]).map(row => ({
+    id: row.id as string,
+    titulo: row.titulo as string,
+    departamento: row.departamento as string,
+    hectareas: row.hectareas as number | null,
+    precio_usd: row.precio_usd as number | null,
+    tipo: row.tipo as string | null,
+    fotos: (row.fotos ?? []) as string[],
+    escritorio_nombre: (row.escritorios as { nombre: string } | null)?.nombre ?? '',
+  }))
+
+  // Score: same tipo +3, price within 25% +3, price within 50% +1
+  const scored = rows
+    .map(c => {
+      let score = 0
+      if (tipo && c.tipo === tipo) score += 3
+      if (precioUsd && c.precio_usd) {
+        const deviation = Math.abs(c.precio_usd - precioUsd) / precioUsd
+        if (deviation < 0.25) score += 3
+        else if (deviation < 0.5) score += 1
+      }
+      return { ...c, score }
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+
+  return scored.map(({ score: _score, ...c }) => c)
+}
