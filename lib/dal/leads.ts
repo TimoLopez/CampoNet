@@ -42,11 +42,16 @@ export async function getLeadsByEscritorio(
   })) as LeadRow[]
 }
 
-export async function getLeadById(leadId: string, escritorioId: string): Promise<(Lead & { campo_titulo: string | null; campo_departamento: string | null }) | null> {
+export async function getLeadById(leadId: string, escritorioId: string): Promise<(Lead & {
+  campo_titulo: string | null
+  campo_departamento: string | null
+  campo_precio_usd: number | null
+  campo_comision_pct: number | null
+}) | null> {
   const supabase = await createServerClient()
   const { data, error } = await supabase
     .from('leads')
-    .select('*, campos(titulo, departamento)')
+    .select('*, campos(titulo, departamento, precio_usd, comision_pct)')
     .eq('id', leadId)
     .eq('escritorio_id', escritorioId)
     .single()
@@ -55,6 +60,8 @@ export async function getLeadById(leadId: string, escritorioId: string): Promise
     ...data,
     campo_titulo: (data.campos as any)?.titulo ?? null,
     campo_departamento: (data.campos as any)?.departamento ?? null,
+    campo_precio_usd: (data.campos as any)?.precio_usd ?? null,
+    campo_comision_pct: (data.campos as any)?.comision_pct ?? null,
     campos: undefined,
   } as any
 }
