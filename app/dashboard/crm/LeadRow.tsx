@@ -30,6 +30,8 @@ interface Props {
     total_visitas: number
     ultima_visita: string | null
     es_caliente: boolean
+    score: number | null
+    score_categoria: 'frio' | 'tibio' | 'caliente' | null
   }
 }
 
@@ -99,6 +101,16 @@ export default function LeadRow({ lead }: Props) {
               </p>
               {lead.es_caliente && (
                 <Flame className="h-3.5 w-3.5 text-orange-500 shrink-0" />
+              )}
+              {lead.score_categoria && (
+                <span className={cn(
+                  'text-[10px] font-semibold px-1.5 py-0.5 rounded-full border tabular-nums',
+                  lead.score_categoria === 'caliente' && 'bg-red-50 text-red-600 border-red-200/80',
+                  lead.score_categoria === 'tibio'    && 'bg-amber-50 text-amber-600 border-amber-200/80',
+                  lead.score_categoria === 'frio'     && 'bg-sky-50 text-sky-600 border-sky-200/80',
+                )}>
+                  {lead.score}
+                </span>
               )}
             </div>
             {(lead.campo_titulo || lead.campo_titulo_snapshot) && (
