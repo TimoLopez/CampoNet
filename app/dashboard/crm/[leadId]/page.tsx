@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowLeft, Mail, Phone, MessageSquare, Flame, MapPin, Calendar, Clock } from 'lucide-react'
 import NotasLead from './NotasLead'
 import LeadTimeline, { type TimelineEvent } from './LeadTimeline'
+import ScoreCard from './ScoreCard'
 import { getLeadById } from '@/lib/dal/leads'
 import { getVisitasForLead } from '@/lib/dal/visitas'
 import { getConsultasForLead } from '@/lib/dal/consultas'
@@ -128,6 +129,15 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
           </div>
         </div>
       </div>
+
+      {/* Score IA */}
+      <ScoreCard
+        leadId={leadId}
+        score={(lead as any).score ?? null}
+        scoreCategoria={(lead as any).score_categoria ?? null}
+        scoreJustificacion={(lead as any).score_justificacion ?? null}
+        scoreUpdatedAt={(lead as any).score_updated_at ?? null}
+      />
 
       {/* Contact info */}
       <div className="bg-white rounded-2xl border border-[#E2DFD6] p-6 shadow-[var(--shadow-card)]">
