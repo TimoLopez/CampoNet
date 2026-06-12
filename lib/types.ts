@@ -45,6 +45,10 @@ export type Lead = {
   notas: string | null
   created_at: string
   updated_at: string
+  score: number | null
+  score_categoria: 'frio' | 'tibio' | 'caliente' | null
+  score_justificacion: string | null
+  score_updated_at: string | null
 }
 
 export type Visita = {

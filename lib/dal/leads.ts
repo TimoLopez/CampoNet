@@ -126,3 +126,19 @@ export async function upsertLead(input: CreateLeadInput): Promise<string> {
   if (error || !newLead) throw error ?? new Error('Lead creation failed')
   return newLead.id
 }
+
+export async function updateLeadScore(
+  leadId: string,
+  data: { score: number; score_categoria: string; score_justificacion: string }
+): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from('leads')
+    .update({
+      score: data.score,
+      score_categoria: data.score_categoria,
+      score_justificacion: data.score_justificacion,
+      score_updated_at: new Date().toISOString(),
+    })
+    .eq('id', leadId)
+  if (error) throw error
+}
