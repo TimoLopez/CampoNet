@@ -6,9 +6,11 @@ import NotasLead from './NotasLead'
 import LeadTimeline, { type TimelineEvent } from './LeadTimeline'
 import ScoreCard from './ScoreCard'
 import ComisionCard from './ComisionCard'
+import VisitasCoordinadas from './VisitasCoordinadas'
 import { getLeadById } from '@/lib/dal/leads'
 import { getVisitasForLead } from '@/lib/dal/visitas'
 import { getConsultasForLead } from '@/lib/dal/consultas'
+import { getVisitasCoordinadasByLead } from '@/lib/dal/visitas-coordinadas'
 import type { Consulta } from '@/lib/types'
 
 const ESTADO_CONFIG: Record<string, { label: string; dot: string; className: string }> = {
@@ -47,6 +49,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
 
   const visitas = await getVisitasForLead(leadId)
   const consultas = await getConsultasForLead(leadId)
+  const visitasCoordinadas = await getVisitasCoordinadasByLead(leadId)
   const cutoffDays = 14
   const cutoff = new Date(Date.now() - cutoffDays * 24 * 60 * 60 * 1000)
   const esCaliente = visitas.filter(v => new Date(v.created_at) > cutoff).length >= 3
@@ -130,6 +133,14 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
           </div>
         </div>
       </div>
+
+      {/* Visitas coordinadas */}
+      <VisitasCoordinadas
+        leadId={leadId}
+        campoId={lead.campo_id}
+        escritorioId={user!.id}
+        initialVisitas={visitasCoordinadas}
+      />
 
       {/* Comisión (solo si la venta está cerrada) */}
       {lead.estado === 'cerrado' && (
