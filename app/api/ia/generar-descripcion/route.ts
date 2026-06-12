@@ -4,33 +4,63 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 export async function POST(request: Request) {
   try {
-    const { titulo, hectareas, departamento, tipo, precio_usd, agua, acceso_ruta, transcripcion } = await request.json()
+    const {
+      titulo, hectareas, departamento, tipo, precio_usd,
+      agua, acceso_ruta, coneat, caracteristicas, transcripcion,
+    } = await request.json()
 
-    const tipoText = tipo ?? 'campo'
-    const aguaText = agua ? 'cuenta con fuentes de agua' : 'sin fuentes de agua verificadas'
-    const accesText = acceso_ruta ? 'tiene acceso por ruta asfaltada' : 'acceso por camino rural'
-    const precioText = precio_usd ? `Precio de referencia: USD ${precio_usd.toLocaleString('es-UY')}.` : ''
-    const transcripcionText = transcripcion
-      ? `\n\nEl propietario describió el campo con sus propias palabras:\n"${transcripcion}"\nUsá este contexto para enriquecer la descripción si aporta detalles relevantes.`
+    const tipoLabel: Record<string, string> = {
+      ganadero: 'ganadero', agricola: 'agrícola', forestal: 'forestal',
+      mixto: 'mixto', turistica: 'turístico / recreativo',
+    }
+    const tipoText = tipo ? tipoLabel[tipo] ?? tipo : 'campo rural'
+
+    const aguaText = agua ? 'cuenta con fuentes de agua naturales' : 'sin fuentes de agua declaradas'
+    const accesText = acceso_ruta ? 'acceso por ruta asfaltada' : 'acceso por camino rural'
+
+    const coneatLine = coneat != null
+      ? `- Índice CONEAT ${coneat} — indica la productividad relativa del suelo (base 100; valores más altos = mayor fertilidad)\n`
       : ''
 
-    const prompt = `Redactá una descripción profesional y atractiva para un campo rural uruguayo con estas características:
-- Nombre: ${titulo}
-- Ubicación: ${departamento}
+    const caracteristicasLine = Array.isArray(caracteristicas) && caracteristicas.length > 0
+      ? `- Infraestructura y características: ${caracteristicas.join(', ')}\n`
+      : ''
+
+    const precioHaLine = precio_usd && hectareas
+      ? `- Precio referencial: USD ${Number(precio_usd).toLocaleString('es-UY')} (USD ${Math.round(precio_usd / hectareas).toLocaleString('es-UY')}/ha)\n`
+      : ''
+
+    const transcripcionBlock = transcripcion
+      ? `\nEl propietario describió el campo con sus propias palabras:\n"${transcripcion}"\nUsá este contexto para enriquecer y personalizar la descripción con detalles que no aparecen en los datos estructurados.\n`
+      : ''
+
+    const prompt = `Sos un escritor especializado en propiedades rurales uruguayas, con décadas de experiencia redactando fichas técnicas para escritorios inmobiliarios de primer nivel. Tu texto aparecerá en la ficha pública del campo — tiene que convencer a un comprador serio.
+
+Redactá una descripción comercial para el siguiente campo:
+
+DATOS DEL CAMPO:
+- Título: ${titulo}
+- Ubicación: ${departamento}, Uruguay
 - Superficie: ${hectareas} hectáreas
-- Tipo: ${tipoText}
+- Aptitud productiva: ${tipoText}
 - Agua: ${aguaText}
 - Acceso: ${accesText}
-${precioText}
-
-La descripción debe tener 3-4 oraciones, tono profesional pero amigable, destacar los puntos fuertes, y estar en español rioplatense. No incluyas precio en la descripción ni menciones "CampoNet". Solo devolvé el texto, sin encabezados ni bullets.${transcripcionText}`
+${coneatLine}${caracteristicasLine}${precioHaLine}${transcripcionBlock}
+INSTRUCCIONES:
+- 2 a 3 párrafos fluidos. Sin listas, sin bullets, sin títulos.
+- Primer párrafo: presentá el campo destacando su escala, aptitud productiva y ubicación.
+- Segundo párrafo: desarrollá las condiciones físicas, infraestructura, acceso y ventajas operativas.
+- Tercer párrafo (opcional, si hay datos suficientes): cerrá con una frase que transmita la oportunidad que representa sin sonar genérico.
+- Tono profesional y directo, como habla un corredor rural experimentado. Español rioplatense natural.
+- Prohibido: frases genéricas como "excelente oportunidad", "no te lo pierdas", "campo de ensueño". Tampoco menciones precios ni "CampoNet".
+- Devolvé solo el texto, sin encabezados ni formateo especial.`
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
-      max_tokens: 300,
-      temperature: 0.7,
-    }, { timeout: 15000 })
+      max_tokens: 500,
+      temperature: 0.65,
+    }, { timeout: 20000 })
 
     const descripcion = completion.choices[0].message.content?.trim() ?? ''
     return Response.json({ descripcion })

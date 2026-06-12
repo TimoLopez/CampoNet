@@ -140,10 +140,15 @@ export default function CampoForm({ initialData }: Props) {
     if (fields.precio_usd) setValue('precio_usd', fields.precio_usd)
     if (fields.agua !== undefined && fields.agua !== null) setValue('agua', fields.agua)
     if (fields.acceso_ruta !== undefined && fields.acceso_ruta !== null) setValue('acceso_ruta', fields.acceso_ruta)
+    if (fields.coneat !== undefined && fields.coneat !== null) setValue('coneat', fields.coneat)
+    if (fields.caracteristicas?.length) {
+      const current = getValues('caracteristicas') ?? []
+      setValue('caracteristicas', [...new Set([...current, ...fields.caracteristicas])])
+    }
   }
 
   async function generateDescription() {
-    const { titulo, hectareas, departamento, tipo, precio_usd, agua, acceso_ruta } = getValues()
+    const { titulo, hectareas, departamento, tipo, precio_usd, agua, acceso_ruta, coneat, caracteristicas } = getValues()
     if (!titulo || !departamento || !hectareas) {
       toast.error('Completá título, departamento y hectáreas primero.')
       return
@@ -153,7 +158,7 @@ export default function CampoForm({ initialData }: Props) {
       const res = await fetch('/api/ia/generar-descripcion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ titulo, hectareas, departamento, tipo, precio_usd, agua, acceso_ruta, transcripcion }),
+        body: JSON.stringify({ titulo, hectareas, departamento, tipo, precio_usd, agua, acceso_ruta, coneat, caracteristicas, transcripcion }),
       })
       const json = await res.json()
       if (json.descripcion) {

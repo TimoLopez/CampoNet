@@ -10,10 +10,12 @@ export interface CampoVozFields {
   titulo?: string | null
   departamento?: string | null
   hectareas?: number | null
-  tipo?: 'ganadero' | 'agricola' | 'forestal' | 'mixto' | null
+  tipo?: 'ganadero' | 'agricola' | 'forestal' | 'mixto' | 'turistica' | null
   precio_usd?: number | null
   agua?: boolean | null
   acceso_ruta?: boolean | null
+  coneat?: number | null
+  caracteristicas?: string[] | null
 }
 
 interface Props {
