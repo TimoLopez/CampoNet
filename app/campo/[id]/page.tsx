@@ -42,6 +42,36 @@ const TIPO_ACCENT: Record<string, { dot: string; text: string; ring: string }> =
 }
 
 
+function getEmbedUrl(url: string): string | null {
+  try {
+    const u = new URL(url)
+
+    // YouTube: youtu.be/ID
+    if (u.hostname === 'youtu.be') {
+      const id = u.pathname.slice(1).split('/')[0]
+      return id ? `https://www.youtube.com/embed/${id}` : null
+    }
+
+    // YouTube: youtube.com/watch?v=ID  or  youtube.com/embed/ID
+    if (u.hostname === 'www.youtube.com' || u.hostname === 'youtube.com') {
+      if (u.pathname.startsWith('/embed/')) return url
+      const id = u.searchParams.get('v')
+      return id ? `https://www.youtube.com/embed/${id}` : null
+    }
+
+    // Vimeo: vimeo.com/ID  or  player.vimeo.com/video/ID
+    if (u.hostname === 'vimeo.com' || u.hostname === 'www.vimeo.com') {
+      const id = u.pathname.split('/').filter(Boolean)[0]
+      return id ? `https://player.vimeo.com/video/${id}` : null
+    }
+    if (u.hostname === 'player.vimeo.com') return url
+
+    return null
+  } catch {
+    return null
+  }
+}
+
 export default async function CampoPublicoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
@@ -417,7 +447,7 @@ export default async function CampoPublicoPage({ params }: { params: Promise<{ i
                 </div>
               )
             })}
-            {campo.video_url && (
+            {campo.video_url && getEmbedUrl(campo.video_url) && (
               <section
                 className="cn-reveal rounded-3xl border border-[#E4E0D6] bg-white p-7 shadow-[0_1px_2px_rgba(28,51,17,.04)]"
                 style={{ animationDelay: "0.14s" }}
@@ -430,10 +460,11 @@ export default async function CampoPublicoPage({ params }: { params: Promise<{ i
                 </div>
                 <div className="aspect-video rounded-2xl overflow-hidden bg-[#F2EFE8] ring-1 ring-[#E4E0D6]">
                   <iframe
-                    src={campo.video_url.replace("watch?v=", "embed/")}
+                    src={getEmbedUrl(campo.video_url)!}
                     className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-                    title="Video del campo"
+                    title="Recorrido en video"
                   />
                 </div>
               </section>
