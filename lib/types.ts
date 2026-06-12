@@ -16,9 +16,19 @@ export type Campo = {
   hectareas: number
   precio_usd: number | null
   precio_ha_usd: number | null
-  tipo: 'ganadero' | 'agricola' | 'forestal' | 'mixto' | null
+  tipo: 'ganadero' | 'agricola' | 'forestal' | 'mixto' | 'turistica' | null
   agua: boolean
   acceso_ruta: boolean
+  coneat: number | null
+  infra_vivienda: boolean
+  infra_galpon: boolean
+  infra_corrales: boolean
+  infra_energia_electrica: boolean
+  infra_riego: boolean
+  infra_caminos_internos: boolean
+  acceso_puerto: boolean
+  acceso_frigorifico: boolean
+  acceso_planta: boolean
   lat: number | null
   lng: number | null
   fotos: string[]
