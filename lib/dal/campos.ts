@@ -168,6 +168,7 @@ export async function getCamposSimilares(params: {
     .eq('estado', 'publicado')
     .eq('departamento', departamento)
     .neq('id', campoId)
+    .order('created_at', { ascending: false })
     .limit(20)
 
   if (error) throw error
