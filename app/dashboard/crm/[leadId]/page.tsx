@@ -133,10 +133,10 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ lea
       {/* Score IA */}
       <ScoreCard
         leadId={leadId}
-        score={(lead as any).score ?? null}
-        scoreCategoria={(lead as any).score_categoria ?? null}
-        scoreJustificacion={(lead as any).score_justificacion ?? null}
-        scoreUpdatedAt={(lead as any).score_updated_at ?? null}
+        score={lead.score ?? null}
+        scoreCategoria={lead.score_categoria ?? null}
+        scoreJustificacion={lead.score_justificacion ?? null}
+        scoreUpdatedAt={lead.score_updated_at ?? null}
       />
 
       {/* Contact info */}
