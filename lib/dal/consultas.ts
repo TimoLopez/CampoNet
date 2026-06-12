@@ -29,3 +29,12 @@ export async function getConsultasForLead(leadId: string): Promise<Consulta[]> {
   if (error) throw error
   return data ?? []
 }
+
+export async function getConsultasCountForCampo(campoId: string): Promise<number> {
+  const { count, error } = await supabaseAdmin
+    .from('consultas')
+    .select('*', { count: 'exact', head: true })
+    .eq('campo_id', campoId)
+  if (error) throw error
+  return count ?? 0
+}
