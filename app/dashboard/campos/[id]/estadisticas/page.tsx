@@ -1,10 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, BarChart2, FileText } from 'lucide-react'
+import { ArrowLeft, BarChart2 } from 'lucide-react'
 import VisitasChart from '@/components/campos/VisitasChart'
 import { getCampoById } from '@/lib/dal/campos'
 import { getVisitasByDayForCampo } from '@/lib/dal/visitas'
+import GenerarReporteButton from './GenerarReporteButton'
 
 export default async function EstadisticasCampoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -43,13 +44,7 @@ export default async function EstadisticasCampoPage({ params }: { params: Promis
 
       <VisitasChart data={visitasData} totalVisitas={totalVisitas} />
 
-      <Link
-        href={`/dashboard/campos/${id}/reporte`}
-        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1C3311] text-white text-sm font-semibold hover:bg-[#254516] active:scale-[0.97] transition-all duration-150 cursor-pointer shadow-[var(--shadow-md)] hover:shadow-[var(--shadow-lg)]"
-      >
-        <FileText className="h-4 w-4" />
-        Generar reporte para el propietario
-      </Link>
+      <GenerarReporteButton campoId={id} />
 
       {/* Placeholder for future metrics */}
       <div className="bg-white rounded-2xl border border-dashed border-[#E2DFD6] p-8 text-center">
