@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Eye, MessageSquare, Users, Flame, CalendarClock, FileText } from 'lucide-react'
 import { getReportePropietario } from '@/lib/dal/reportes'
-import VisitasChart from '@/components/campos/VisitasChart'
+import ReporteVisitasChart from './ReporteVisitasChart'
 import PrintButton from './PrintButton'
 
 const TIPO_LABEL: Record<string, string> = {
@@ -79,7 +79,7 @@ export default async function ReportePropietarioPage({ params }: { params: Promi
       </div>
 
       {/* Visitas online trend */}
-      <VisitasChart data={reporte.visitasOnline.porDia} totalVisitas={reporte.visitasOnline.total} />
+      <ReporteVisitasChart data={reporte.visitasOnline.porDia} totalVisitas={reporte.visitasOnline.total} />
 
       {/* Interesados destacados */}
       <div className="bg-white rounded-2xl border border-[#E2DFD6] shadow-[var(--shadow-card)] overflow-hidden">
