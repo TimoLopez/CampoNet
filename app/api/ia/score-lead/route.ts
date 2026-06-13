@@ -59,19 +59,34 @@ export async function POST(request: Request) {
 
     const prompt = `Eres un asistente para escritorios inmobiliarios rurales en Uruguay.
 Analiza este lead y asigna un score de intención de compra del 0 al 100.
+IMPORTANTE: usa todo el rango — no ancles en el centro. Diferencia claramente entre leads con 2 visitas y leads con 10 visitas.
 
 Campo de interés: ${campoInfo}
-Lead: ${lead.nombre}${lead.telefono ? ' (dejó teléfono)' : ' (solo email, sin teléfono)'}
+Lead: ${lead.nombre}${lead.telefono ? ' (dejó teléfono — señal de compromiso real)' : ' (solo email, sin teléfono)'}
 Primera consulta: hace ${diasDesdeContacto} día${diasDesdeContacto !== 1 ? 's' : ''}
-Visitas registradas al campo: ${visitas.length}${ultimaVisitaDias !== null ? ` (última hace ${ultimaVisitaDias} día${ultimaVisitaDias !== 1 ? 's' : ''})` : ''}
+Visitas al campo: ${visitas.length}${ultimaVisitaDias !== null ? ` (última hace ${ultimaVisitaDias} día${ultimaVisitaDias !== 1 ? 's' : ''})` : ''}
+Consultas enviadas: ${consultas.length}
 
-Mensajes enviados por el lead:
+Mensajes del lead:
 ${mensajes}
 
-Criterios de scoring:
-- frio (0-30): consulta genérica, sin teléfono, pocas o ninguna visita
-- tibio (31-70): preguntas específicas sobre el campo, varias visitas, deja teléfono
-- caliente (71-100): menciona presupuesto disponible, urgencia temporal, financiamiento listo, o pide coordinar visita al campo
+Criterios de scoring — aplica el que mejor encaja con el perfil completo:
+
+frio (0-30):
+  • Mensaje genérico ("info nomás", "saludos", sin pregunta concreta)
+  • 1-2 visitas en total, sin revisitas recientes
+  • Una sola consulta, sin seguimiento
+
+tibio (31-70) — usa el rango completo según intensidad:
+  • 31-45: pregunta precio en una sola consulta, 2-4 visitas, sin más señales
+  • 46-60: 5-8 visitas o 2 consultas, muestra interés concreto en el campo
+  • 61-70: 8+ visitas, o sigue visitando hoy/ayer, o mandó más de una consulta con seguimiento activo ("sigo a la espera", "esperando respuesta")
+
+caliente (71-100):
+  • Menciona presupuesto, financiamiento o capital disponible
+  • Indica urgencia temporal ("antes de marzo", "necesito cerrar pronto")
+  • Pide coordinar visita presencial al campo
+  • Combinación de: teléfono + seguimiento activo + múltiples visitas recientes
 
 Responde ÚNICAMENTE con un JSON válido, sin texto adicional:
 {"score": <número entero 0-100>, "categoria": "<frio|tibio|caliente>", "justificacion": "<una sola oración en español que explique el score>"}`
