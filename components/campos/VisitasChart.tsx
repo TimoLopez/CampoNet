@@ -18,7 +18,13 @@ export default function VisitasChart({ data, totalVisitas }: VisitasChartProps) 
   const isEmpty = totalVisitas === 0
 
   return (
-    <div className="bg-white rounded-2xl border border-[#E2DFD6] p-6 shadow-[var(--shadow-card)] print:break-inside-avoid print:shadow-none overflow-hidden">
+    <div className="bg-white rounded-2xl border border-[#E2DFD6] p-6 shadow-[var(--shadow-card)] print:break-inside-avoid print:shadow-none">
+      <style>{`
+        @media print {
+          .recharts-wrapper { width: 100% !important; }
+          .recharts-surface { width: 100% !important; }
+        }
+      `}</style>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold text-[#1A1A12]">Visitas últimos 30 días</h2>
         <span className="inline-flex items-center rounded-full bg-[#F0EDE6] px-2.5 py-0.5 text-xs font-medium text-[#1A1A12]">
