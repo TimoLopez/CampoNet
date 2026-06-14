@@ -1,7 +1,21 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Eye, MessageSquare, Users, CalendarClock, TrendingUp } from 'lucide-react'
 import { getReporteByToken } from '@/lib/dal/propietario'
 import ReporteVisitasChart from '@/components/ReporteVisitasChart'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ token: string }>
+}): Promise<Metadata> {
+  const { token } = await params
+  const reporte = await getReporteByToken(token)
+  return {
+    title: reporte ? `Portal · ${reporte.campo.titulo}` : 'Portal del propietario',
+    robots: { index: false, follow: false },
+  }
+}
 
 const TIPO_LABEL: Record<string, string> = {
   ganadero: 'Ganadero',
