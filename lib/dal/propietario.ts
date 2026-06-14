@@ -55,22 +55,21 @@ export async function getReporteByToken(token: string): Promise<ReportePortalPro
   }
 
   // Fetch visitas coordinadas stats via supabaseAdmin (no auth context available in public token portal)
-  const { data: vcData } = await supabaseAdmin
-    .from('visitas_coordinadas')
-    .select('estado')
-    .eq('campo_id', campoId)
+  const [visitasPorDia, consultasCount, vcResult] = await Promise.all([
+    getVisitasByDayForCampo(campoId, 30),
+    getConsultasCountForCampo(campoId),
+    supabaseAdmin
+      .from('visitas_coordinadas')
+      .select('estado')
+      .eq('campo_id', campoId),
+  ])
 
   const visitasCoordinadasStats: VisitasCoordinadasStats = { programadas: 0, realizadas: 0, canceladas: 0 }
-  for (const row of vcData ?? []) {
+  for (const row of vcResult.data ?? []) {
     if (row.estado === 'programada') visitasCoordinadasStats.programadas++
     else if (row.estado === 'realizada') visitasCoordinadasStats.realizadas++
     else if (row.estado === 'cancelada') visitasCoordinadasStats.canceladas++
   }
-
-  const [visitasPorDia, consultasCount] = await Promise.all([
-    getVisitasByDayForCampo(campoId, 30),
-    getConsultasCountForCampo(campoId),
-  ])
 
   const totalVisitasOnline = visitasPorDia.reduce((sum, d) => sum + d.visitas, 0)
 
