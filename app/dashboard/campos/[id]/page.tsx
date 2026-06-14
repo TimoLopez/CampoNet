@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react'
 import CampoForm from '@/components/campos/CampoForm'
 import CampoEstadoActions from '@/components/campos/CampoEstadoActions'
 import ShareCampoButton from '@/components/ShareCampoButton'
+import CompartirConDueno from './CompartirConDueno'
 import { getCampoById } from '@/lib/dal/campos'
 import { getLeadCountForCampo } from '@/lib/dal/leads'
 
@@ -45,6 +46,9 @@ export default async function EditarCampoPage({ params }: { params: Promise<{ id
           />
         </div>
       </div>
+
+      <CompartirConDueno token={campo.propietario_token} titulo={campo.titulo} />
+
       <CampoForm initialData={campo} />
     </div>
   )
