@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Eye, MessageSquare, Users, Flame, CalendarClock, FileText } from 'lucide-react'
 import { getReportePropietario } from '@/lib/dal/reportes'
-import ReporteVisitasChart from './ReporteVisitasChart'
+import ReporteVisitasChart from '@/components/ReporteVisitasChart'
 import PrintButton from './PrintButton'
 
 const TIPO_LABEL: Record<string, string> = {
