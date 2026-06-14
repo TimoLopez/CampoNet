@@ -30,6 +30,7 @@ export type Campo = {
   estado: 'publicado' | 'borrador' | 'archivado' | 'vendido'
   created_at: string
   updated_at: string
+  propietario_token: string
 }
 
 export type Lead = {
