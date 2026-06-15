@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { getEscritorioBySlug } from '@/lib/dal/escritorios'
 import { getCamposPublicosPorEscritorio } from '@/lib/dal/campos'
 import EscritorioHero from './EscritorioHero'
+import CamposPublicosGrid from './CamposPublicosGrid'
 
 export async function generateMetadata({
   params,
@@ -42,11 +43,8 @@ export default async function EscritorioPublicoPage({
     <div className="min-h-screen bg-[#F7F5F0] pb-12">
       <EscritorioHero escritorio={escritorio} />
 
-      <main className="max-w-3xl mx-auto px-4 mt-10 space-y-6">
-        {/* Más componentes en tasks siguientes */}
-        <div className="text-center text-sm text-[#8B8A7E]">
-          {campos.length} {campos.length === 1 ? 'campo publicado' : 'campos publicados'}
-        </div>
+      <main className="max-w-3xl mx-auto px-4 mt-10 space-y-8">
+        <CamposPublicosGrid campos={campos} />
       </main>
     </div>
   )
