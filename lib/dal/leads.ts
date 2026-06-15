@@ -19,6 +19,7 @@ export type CreateLeadInput = {
   nombre: string
   email: string | null
   telefono: string | null
+  origen: 'pagina_publica' | 'buscador' | 'directo' | 'manual'
 }
 
 export async function getLeadsByEscritorio(
@@ -126,6 +127,7 @@ export async function upsertLead(input: CreateLeadInput): Promise<string> {
       nombre: input.nombre,
       email: input.email,
       telefono: input.telefono,
+      origen: input.origen,
     })
     .select('id')
     .single()

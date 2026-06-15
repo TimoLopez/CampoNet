@@ -24,6 +24,26 @@ export async function POST(request: Request) {
 
     if (!campo) return NextResponse.json({ error: 'Campo no encontrado' }, { status: 404 })
 
+    const cookieStore = await cookies()
+    const sessionId = cookieStore.get('session_id')?.value
+
+    let origen: 'pagina_publica' | 'buscador' | 'directo' | 'manual' = 'directo'
+
+    if (sessionId) {
+      const { data: sessionVisitas } = await supabaseAdmin
+        .from('visitas')
+        .select('referrer_path')
+        .eq('session_id', sessionId)
+        .not('referrer_path', 'is', null)
+        .order('created_at', { ascending: true })
+
+      for (const v of sessionVisitas ?? []) {
+        const path = v.referrer_path ?? ''
+        if (path.startsWith('/escritorios/')) { origen = 'pagina_publica'; break }
+        if (path === '/campos' || path.startsWith('/campos?')) { origen = 'buscador'; break }
+      }
+    }
+
     const leadId = await upsertLead({
       campoId,
       escritorioId: campo.escritorio_id,
@@ -31,6 +51,7 @@ export async function POST(request: Request) {
       nombre,
       email: email ?? null,
       telefono: telefono ?? null,
+      origen,
     })
 
     await createConsulta({
@@ -40,8 +61,6 @@ export async function POST(request: Request) {
       mensaje: mensaje ?? '(sin mensaje)',
     })
 
-    const cookieStore = await cookies()
-    const sessionId = cookieStore.get('session_id')?.value
     if (sessionId) {
       await associateVisitasToLead(sessionId, campoId, leadId)
     }
