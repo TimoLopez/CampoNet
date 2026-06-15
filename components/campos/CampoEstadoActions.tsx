@@ -34,9 +34,27 @@ export default function CampoEstadoActions({ campoId, estado, leadsCount }: Prop
   async function updateEstado(nuevoEstado: EstadoCampo) {
     setLoading(true)
     const supabase = createClient()
+
+    // Fetch current timestamp fields before updating
+    const { data: campoActual } = await supabase
+      .from('campos')
+      .select('published_at, vendido_at')
+      .eq('id', campoId)
+      .single()
+
+    const updates: Record<string, unknown> = { estado: nuevoEstado }
+
+    if (nuevoEstado === 'publicado' && campoActual?.published_at === null) {
+      updates.published_at = new Date().toISOString()
+    }
+
+    if (nuevoEstado === 'vendido' && campoActual?.vendido_at === null) {
+      updates.vendido_at = new Date().toISOString()
+    }
+
     const { error } = await supabase
       .from('campos')
-      .update({ estado: nuevoEstado })
+      .update(updates)
       .eq('id', campoId)
     setLoading(false)
     if (error) {
