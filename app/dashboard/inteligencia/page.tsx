@@ -1,18 +1,28 @@
 import { createClient } from '@/lib/supabase/server'
 import { BarChart3 } from 'lucide-react'
-import { getFunnelStats, getPerformancePorCampo, getTiemposDeVenta } from '@/lib/dal/inteligencia'
+import {
+  getFunnelStats,
+  getPerformancePorCampo,
+  getTiemposDeVenta,
+  getOrigenLeads,
+  getComisionesStats,
+} from '@/lib/dal/inteligencia'
 import FunnelChart from './FunnelChart'
 import PerformancePorCampo from './PerformancePorCampo'
 import TiemposChart from './TiemposChart'
+import OrigenLeads from './OrigenLeads'
+import ComisionesPanel from './ComisionesPanel'
 
 export default async function InteligenciaPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const [funnel, performance, tiempos] = await Promise.all([
+  const [funnel, performance, tiempos, origen, comisiones] = await Promise.all([
     getFunnelStats(user!.id),
     getPerformancePorCampo(user!.id),
     getTiemposDeVenta(user!.id),
+    getOrigenLeads(user!.id),
+    getComisionesStats(user!.id),
   ])
 
   return (
@@ -29,9 +39,13 @@ export default async function InteligenciaPage() {
         </div>
       </div>
 
+      <ComisionesPanel stats={comisiones} />
       <FunnelChart stats={funnel} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <OrigenLeads stats={origen} />
+        <TiemposChart tiempos={tiempos} />
+      </div>
       <PerformancePorCampo campos={performance} />
-      <TiemposChart tiempos={tiempos} />
     </div>
   )
 }
