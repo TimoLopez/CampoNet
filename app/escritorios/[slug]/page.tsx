@@ -6,6 +6,7 @@ import EscritorioHero from './EscritorioHero'
 import CamposPublicosGrid from './CamposPublicosGrid'
 import MetricasPublicas from './MetricasPublicas'
 import EscritorioContacto from './EscritorioContacto'
+import MarkSource from '@/components/MarkSource'
 
 export async function generateMetadata({
   params,
@@ -43,6 +44,7 @@ export default async function EscritorioPublicoPage({
 
   return (
     <div className="min-h-screen bg-[#F7F5F0] pb-12">
+      <MarkSource source="pagina_publica" />
       <EscritorioHero escritorio={escritorio} />
 
       <main className="max-w-3xl mx-auto px-4 mt-10 space-y-8">

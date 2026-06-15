@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
     }
-    const { campoId, nombre, email, telefono, mensaje } = parsed.data
+    const { campoId, nombre, email, telefono, mensaje, origenHint } = parsed.data
 
     const { data: campo } = await supabaseAdmin
       .from('campos')
@@ -29,7 +29,13 @@ export async function POST(request: Request) {
 
     let origen: 'pagina_publica' | 'buscador' | 'directo' | 'manual' = 'directo'
 
-    if (sessionId) {
+    // 1) Hint del cliente (sessionStorage) — más confiable porque sobrevive a
+    // la navegación client-side de Next.js, donde document.referrer no se actualiza.
+    if (origenHint === 'pagina_publica' || origenHint === 'buscador') {
+      origen = origenHint
+    } else if (sessionId) {
+      // 2) Fallback: inferir desde las visitas de la sesión por referrer_path.
+      // Funciona solo cuando el usuario hizo navegación con recarga completa.
       const { data: sessionVisitas } = await supabaseAdmin
         .from('visitas')
         .select('referrer_path')

@@ -6,6 +6,7 @@ export const CreateLeadSchema = z.object({
   email: z.string().email('Email inválido').nullable().optional(),
   telefono: z.string().nullable().optional(),
   mensaje: z.string().nullable().optional(),
+  origenHint: z.enum(['pagina_publica', 'buscador']).nullable().optional(),
 }).refine(data => data.email || data.telefono, {
   message: 'Se requiere al menos email o teléfono',
 })
