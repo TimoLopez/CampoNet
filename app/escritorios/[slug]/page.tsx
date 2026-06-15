@@ -4,6 +4,8 @@ import { getEscritorioBySlug } from '@/lib/dal/escritorios'
 import { getCamposPublicosPorEscritorio } from '@/lib/dal/campos'
 import EscritorioHero from './EscritorioHero'
 import CamposPublicosGrid from './CamposPublicosGrid'
+import MetricasPublicas from './MetricasPublicas'
+import EscritorioContacto from './EscritorioContacto'
 
 export async function generateMetadata({
   params,
@@ -44,7 +46,14 @@ export default async function EscritorioPublicoPage({
       <EscritorioHero escritorio={escritorio} />
 
       <main className="max-w-3xl mx-auto px-4 mt-10 space-y-8">
+        {escritorio.metricas_publicas && (
+          <MetricasPublicas campos={campos} />
+        )}
         <CamposPublicosGrid campos={campos} />
+        <EscritorioContacto escritorio={escritorio} />
+        <p className="text-center text-[11px] text-[#B0AD9E] pt-4">
+          Propulsado por <a href="/" className="text-[#8B6914] hover:underline">CampoNet</a>
+        </p>
       </main>
     </div>
   )
