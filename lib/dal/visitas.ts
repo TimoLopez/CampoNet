@@ -13,6 +13,7 @@ export type RegisterVisitaInput = {
   ipHash: string | null
   userAgent: string | null
   leadId: string | null
+  referrerPath: string | null
 }
 
 // Pure function — no DB calls. Extract visit stats from a flat list of visitas.
@@ -104,6 +105,7 @@ export async function registerVisita(input: RegisterVisitaInput): Promise<void> 
     ip_hash: input.ipHash,
     user_agent: input.userAgent,
     lead_id: input.leadId,
+    referrer_path: input.referrerPath,
   })
   if (error) throw error
 }

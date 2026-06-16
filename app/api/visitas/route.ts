@@ -12,6 +12,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
     }
     const { campoId } = parsed.data
+    const referrerPath = typeof body.referrerPath === 'string' ? body.referrerPath.slice(0, 200) : null
 
     const cookieStore = await cookies()
     const existing = cookieStore.get('session_id')?.value
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
 
     const prevLeadId = await getPrevLeadIdForSession(sessionId, campoId)
 
-    await registerVisita({ campoId, sessionId, ipHash, userAgent, leadId: prevLeadId })
+    await registerVisita({ campoId, sessionId, ipHash, userAgent, leadId: prevLeadId, referrerPath })
 
     const res = NextResponse.json({ ok: true })
     if (isNew) {
