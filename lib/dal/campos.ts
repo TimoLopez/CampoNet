@@ -203,3 +203,27 @@ export async function getCamposSimilares(params: {
 
   return scored.map(({ score: _score, ...c }) => c)
 }
+
+// Para la página pública del escritorio — solo campos publicados, info pública mínima
+export async function getCamposPublicosPorEscritorio(escritorioId: string): Promise<CampoPublicoCard[]> {
+  const { data, error } = await supabaseAdmin
+    .from('campos')
+    .select('id, titulo, departamento, hectareas, precio_usd, tipo, fotos, escritorios(nombre)')
+    .eq('estado', 'publicado')
+    .eq('escritorio_id', escritorioId)
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return ((data ?? []) as any[]).map((row) => ({
+    id: row.id as string,
+    titulo: row.titulo as string,
+    departamento: row.departamento as string,
+    hectareas: row.hectareas as number | null,
+    precio_usd: row.precio_usd as number | null,
+    tipo: row.tipo as string | null,
+    fotos: (row.fotos ?? []) as string[],
+    escritorio_nombre: (row.escritorios as { nombre: string } | null)?.nombre ?? '',
+  }))
+}

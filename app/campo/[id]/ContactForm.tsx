@@ -38,12 +38,27 @@ export default function ContactForm({ campoId }: { campoId: string }) {
   async function onSubmit(data: any) {
     setLoading(true)
     try {
+      let origenHint: string | null = null
+      try {
+        const stored = sessionStorage.getItem('camponet_lead_origin')
+        if (stored === 'pagina_publica' || stored === 'buscador') origenHint = stored
+      } catch {
+        // sessionStorage no disponible
+      }
+
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ campoId, ...data }),
+        body: JSON.stringify({ campoId, ...data, origenHint }),
       })
       if (!res.ok) throw new Error()
+
+      try {
+        sessionStorage.removeItem('camponet_lead_origin')
+      } catch {
+        // ignore
+      }
+
       setSubmitted(true)
     } catch {
       toast.error('Error al enviar la consulta. Intentá nuevamente.')

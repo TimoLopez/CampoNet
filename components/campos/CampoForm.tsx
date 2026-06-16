@@ -185,7 +185,12 @@ export default function CampoForm({ initialData }: Props) {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
 
-      const payload = {
+      const nuevoEstado = publicar ? 'publicado' : data.estado
+
+      // Set published_at the first time a campo transitions to publicado
+      const shouldSetPublishedAt = nuevoEstado === 'publicado' && !initialData?.published_at
+
+      const payload: Record<string, unknown> = {
         titulo: data.titulo,
         departamento: data.departamento,
         hectareas: data.hectareas,
@@ -199,11 +204,12 @@ export default function CampoForm({ initialData }: Props) {
         comision_pct: data.comision_pct ?? null,
         exclusividad: data.exclusividad,
         video_url: data.video_url || null,
-        estado: publicar ? 'publicado' : data.estado,
+        estado: nuevoEstado,
         lat: data.lat ?? null,
         lng: data.lng ?? null,
         fotos: data.fotos,
         escritorio_id: user!.id,
+        ...(shouldSetPublishedAt ? { published_at: new Date().toISOString() } : {}),
       }
 
       let error: any

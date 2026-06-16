@@ -4,6 +4,10 @@ export type Escritorio = {
   telefono: string | null
   descripcion: string | null
   logo_url: string | null
+  slug: string | null
+  tagline: string | null
+  cover_image_url: string | null
+  metricas_publicas: boolean
   created_at: string
 }
 
@@ -31,6 +35,8 @@ export type Campo = {
   created_at: string
   updated_at: string
   propietario_token: string
+  published_at: string | null
+  vendido_at: string | null
 }
 
 export type Lead = {
@@ -50,6 +56,7 @@ export type Lead = {
   score_categoria: 'frio' | 'tibio' | 'caliente' | null
   score_justificacion: string | null
   score_updated_at: string | null
+  origen: 'pagina_publica' | 'buscador' | 'directo' | 'manual' | null
 }
 
 export type Visita = {
@@ -60,6 +67,7 @@ export type Visita = {
   ip_hash: string | null
   user_agent: string | null
   created_at: string
+  referrer_path: string | null
 }
 
 export type LeadConVisitas = Lead & {

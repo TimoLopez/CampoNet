@@ -5,6 +5,7 @@ import { getCamposPublicos } from '@/lib/dal/campos'
 import type { CamposPublicosFilters } from '@/lib/dal/campos'
 import CampoCard from './CampoCard'
 import CamposFilters from './CamposFilters'
+import MarkSource from '@/components/MarkSource'
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -57,6 +58,7 @@ export default async function CamposPage({ searchParams }: PageProps) {
       />
 
       <div className="min-h-screen bg-[#F4F2EB] text-[#1A1A12] antialiased">
+        <MarkSource source="buscador" />
         {/* Navbar */}
         <header className="sticky top-0 z-40 cn-glass border-b border-[#E4E0D6]">
           <div className="max-w-6xl mx-auto px-5 py-3 flex items-center justify-between">

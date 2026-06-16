@@ -19,6 +19,7 @@ export type CreateLeadInput = {
   nombre: string
   email: string | null
   telefono: string | null
+  origen: 'pagina_publica' | 'buscador' | 'directo' | 'manual'
 }
 
 export async function getLeadsByEscritorio(
@@ -126,12 +127,38 @@ export async function upsertLead(input: CreateLeadInput): Promise<string> {
       nombre: input.nombre,
       email: input.email,
       telefono: input.telefono,
+      origen: input.origen,
     })
     .select('id')
     .single()
 
   if (error || !newLead) throw error ?? new Error('Lead creation failed')
   return newLead.id
+}
+
+export type LeadActivoOtro = {
+  id: string
+  nombre: string
+  estado: 'nuevo' | 'contactado' | 'negociacion'
+}
+
+// Para el dialog de cierre: trae leads activos (no descartado/cerrado) del mismo campo,
+// excluyendo el lead que se está cerrando.
+export async function getOtrosLeadsActivosPorCampo(
+  campoId: string,
+  excludeLeadId: string,
+  escritorioId: string
+): Promise<LeadActivoOtro[]> {
+  const { data, error } = await supabaseAdmin
+    .from('leads')
+    .select('id, nombre, estado')
+    .eq('campo_id', campoId)
+    .eq('escritorio_id', escritorioId)
+    .neq('id', excludeLeadId)
+    .in('estado', ['nuevo', 'contactado', 'negociacion'])
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return (data ?? []) as LeadActivoOtro[]
 }
 
 export async function updateLeadScore(

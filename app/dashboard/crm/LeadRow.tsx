@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Flame, ArrowRight, Eye } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import CerrarLeadDialog from './CerrarLeadDialog'
 
 type EstadoLead = 'nuevo' | 'contactado' | 'negociacion' | 'cerrado' | 'descartado'
 
@@ -65,9 +67,18 @@ function avatarColor(id: string) {
 
 export default function LeadRow({ lead }: Props) {
   const [estado, setEstado] = useState<EstadoLead>(lead.estado)
+  const [cerrarOpen, setCerrarOpen] = useState(false)
   const config = ESTADO_CONFIG[estado]
+  const router = useRouter()
 
   async function handleEstado(value: EstadoLead) {
+    // Caso especial: marcar como cerrado → abre dialog de confirmación
+    // (también marca el campo como vendido + descarta otros leads activos opcionalmente)
+    if (value === 'cerrado') {
+      setCerrarOpen(true)
+      return
+    }
+
     const prev = estado
     setEstado(value)
     const supabase = createClient()
@@ -76,6 +87,13 @@ export default function LeadRow({ lead }: Props) {
       setEstado(prev)
       toast.error('Error al cambiar el estado.')
     }
+  }
+
+  function onCerrarSuccess() {
+    setEstado('cerrado')
+    // Refresca el server component padre para que conteos y otros leads
+    // descartados se reflejen en la UI sin recargar la página.
+    router.refresh()
   }
 
   return (
@@ -177,6 +195,17 @@ export default function LeadRow({ lead }: Props) {
           <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform duration-150" />
         </Link>
       </td>
+
+      {/* Dialog de cierre — Dialog.Root no renderiza DOM, el contenido se portalea */}
+      <CerrarLeadDialog
+        open={cerrarOpen}
+        onOpenChange={setCerrarOpen}
+        leadId={lead.id}
+        leadNombre={lead.nombre}
+        campoId={lead.campo_id}
+        campoTitulo={lead.campo_titulo ?? lead.campo_titulo_snapshot}
+        onSuccess={onCerrarSuccess}
+      />
     </tr>
   )
 }
